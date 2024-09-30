@@ -7,11 +7,15 @@ TA Chatbot is a application that allows teachers to integrate their syllabus int
 
 Contributors
 
-Cameron Smith
-Lihn Nguyen
-Shashank Rana
-Liam Quinlan
-Anish Banswada
+- [Tomer Ozmo](https://github.com/contributor3) - Group Leader
+- [Anish Banswada](https://github.com/contributor2) - Code Lead
+- [Cameron Smith](https://github.com/contributor1) - Style Lead
+- [Lihn Nguyen](https://github.com/contributor2) - Quality Assurance
+- [Shashank Rana](https://github.com/contributor3) - Design Lead
+- [Liam Quinlan](https://github.com/contributor1) - Client Lead
+
+
+
 
 Prerequisites
 List the technologies and versions required to run the project:
