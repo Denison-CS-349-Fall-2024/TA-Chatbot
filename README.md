@@ -21,9 +21,6 @@ Clone the repository:
 ```bash
 git clone https://github.com/Denison-CS-349-Fall-2024/TA-Chatbot.git
 ```
-```bash
-cd <repository_directory>
-```
 
 
 
