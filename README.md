@@ -15,7 +15,8 @@ Contributors
 - [Liam Quinlan](https://github.com/contributor1) - Client Lead
 
 # Table of contents(#table-of-contents)
-- [Project Description](#ProjectDescription)
+- [Project Description](#project-description)
+- [Contributors](#contributors)
 
 
 # Prerequisites
