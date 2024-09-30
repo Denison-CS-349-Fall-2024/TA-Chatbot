@@ -10,7 +10,7 @@ Contributors
 - [Tomer Ozmo](https://github.com/contributor3) - Group Leader
 - [Anish Banswada](https://github.com/contributor2) - Code Lead
 - [Cameron Smith](https://github.com/contributor1) - Style Lead
-- [Lihn Nguyen](https://github.com/contributor2) - Quality Assurance
+- [Lihn Nguyen](https://github.com/contributor2) - Quality Assurance Lead
 - [Shashank Rana](https://github.com/contributor3) - Design Lead
 - [Liam Quinlan](https://github.com/contributor1) - Client Lead
 
