@@ -19,7 +19,7 @@ List the technologies and versions required to run the project:
 
 Clone the repository:
 ```bash
-git clone <repository_url>
+git clone https://github.com/Denison-CS-349-Fall-2024/TA-Chatbot.git
 ```
 ```bash
 cd <repository_directory>
