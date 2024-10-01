@@ -2,7 +2,6 @@
 
 ## Project Description
 
-Description:
 TA Chatbot is a application that allows teachers to integrate their syllabus into a AI-driven chatbot to provide students an easy way ask questions about the syllabus, assignments, or course materials with quick and accurate responses.
 
 ## Contributors
