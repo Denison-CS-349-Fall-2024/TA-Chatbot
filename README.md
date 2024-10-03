@@ -4,7 +4,7 @@
 
 TA Chatbot is a application that allows teachers to integrate their syllabus into a AI-driven chatbot to provide students an easy way ask questions about the syllabus, assignments, or course materials with quick and accurate responses.
 
-## Contributors(IDK your github username so pls put in link)
+## Contributors (IDK your github username so pls put in link)
 
 - [Tomer Ozmo](https://github.com/contributor3) - Group Leader
 - [Anish Banswada](https://github.com/contributor2) - Code Lead
