@@ -27,9 +27,13 @@ Node.js
 Angular CLI
 
 To run the Angular app,
+
 navigate to my-angular-app directory
+
 enter command: ng serve
+
 use "command + enter" on the local host url to see the app
+
 close the app with "q + enter" in the terminal
 
 
