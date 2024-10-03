@@ -23,6 +23,15 @@ TA Chatbot is a application that allows teachers to integrate their syllabus int
 # Prerequisites
 List the technologies and versions required to run the project:
 
+Node.js
+Angular CLI
+
+To run the Angular app,
+navigate to my-angular-app directory
+enter command: ng serve
+use "command + enter" on the local host url to see the app
+close the app with "q + enter" in the terminal
+
 
 Clone the repository:
 ```bash
