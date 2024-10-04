@@ -29,23 +29,32 @@ Angular CLI
 
 Check if you have node and npm with the following commands:
 
+```bash
 node -v
+```
 
+```bash
 npm -v
+```
 
 If you don't have them, follow the instructions at the Node.js website: https://nodejs.org/
 
 install angular with the following command:
 
+```bash
 npm install -g @angular/cli
-
+```
 
 
 To run the Angular app,
 
 navigate to my-angular-app directory
 
-enter command: ng serve
+enter command: 
+
+```bash
+ng serve
+```
 
 use "command + enter" on the local host url to see the app
 
