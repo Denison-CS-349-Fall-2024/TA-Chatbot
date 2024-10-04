@@ -21,7 +21,16 @@ TA Chatbot is a application that allows teachers to integrate their syllabus int
 
 
 # Prerequisites
-List the technologies and versions required to run the project:
+
+
+Clone the repository:
+```bash
+git clone https://github.com/Denison-CS-349-Fall-2024/TA-Chatbot.git
+```
+
+
+
+Once the repository has been cloned, follow these instructions to install all necessary dependencies:
 
 Node.js
 NPM (Node Project Manager)
@@ -60,14 +69,5 @@ use "command + enter" on the local host url to see the app
 
 close the app with "q + enter" in the terminal
 
-
-Clone the repository:
-```bash
-git clone https://github.com/Denison-CS-349-Fall-2024/TA-Chatbot.git
-```
-
-
-
-Once the repository has been cloned, follow these instructions to install all necessary dependencies:
 
 
