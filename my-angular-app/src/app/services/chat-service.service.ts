@@ -6,4 +6,6 @@ import { Injectable } from '@angular/core';
 export class ChatServiceService {
 
   constructor() { }
+
+  public name: any;
 }
