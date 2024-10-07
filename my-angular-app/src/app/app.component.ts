@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ChatComponent } from './components/chat/chat.component';
+import { initFlowbite } from 'flowbite';
 
 @Component({
   selector: 'app-root',
@@ -11,4 +12,7 @@ import { ChatComponent } from './components/chat/chat.component';
 })
 export class AppComponent {
   title: string = 'my-angular-app';
+  ngOnInit(): void {
+    initFlowbite();
+  }
 }
