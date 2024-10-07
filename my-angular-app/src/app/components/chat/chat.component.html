@@ -1,14 +1,14 @@
 <div id="main-chat-container" class = "w-full flex justify-center">
   <div class="flex w-1/2 flex-col bg-gray-300 p-3">
     <!-- Chat list starts here: -->
-      @for(chat of this.chats; track chat){
-        @if(chat.isSentByUser === false){
+      @for(message of this.messages; track message){
+        @if(message.isSentByUser === false){
            <div class="flex items-start gap-2.5 mb-1">
               <div class="relative inline-flex items-center justify-center w-10 h-10 overflow-hidden bg-gray-100 rounded-full dark:bg-gray-600">
                   <span class="font-medium text-gray-600 dark:text-gray-300">TA</span>
               </div>
               <div class="flex flex-col w-full max-w-[320px] leading-1.5 p-4 border-gray-200 bg-gray-100 rounded-e-xl rounded-es-xl dark:bg-gray-700">
-                <p class="text-sm font-normal py-2.5 text-gray-900 dark:text-white">{{chat.content}}</p>
+                <p class="text-sm font-normal py-2.5 text-gray-900 dark:text-white">{{message.content}}</p>
               </div>
            </div>
         }@else{
@@ -16,8 +16,8 @@
                <div class="relative inline-flex items-center justify-center w-10 h-10 overflow-hidden bg-gray-100 rounded-full dark:bg-gray-600">
                    <span class="font-medium text-gray-600 dark:text-gray-300">S</span>
                </div>
-               <div class="flex flex-col w-full max-w-[320px] leading-1.5 p-4 border-gray-200 bg-gray-100 rounded-e-xl rounded-es-xl dark:bg-gray-700">
-                 <p class="text-sm font-normal py-2.5 text-gray-900 dark:text-white">{{chat.content}}</p>
+               <div class="flex flex-col w-full max-w-[320px] leading-1.5 p-4 border-gray-200 bg-gray-100 rounded-ee-xl rounded-s-xl dark:bg-gray-700">
+                 <p class="text-sm font-normal py-2.5 text-gray-900 dark:text-white">{{message.content}}</p>
                </div>
            </div>
         }
