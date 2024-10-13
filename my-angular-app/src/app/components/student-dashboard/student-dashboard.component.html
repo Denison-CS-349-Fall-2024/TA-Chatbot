@@ -1,2 +1,10 @@
-<p>Hello Liam</p>
-<p>Your TAs</p>
+<p class="lowered-Welcome-Text">Hello {{student}}</p>
+
+<h1><b>Your TAs</b></h1>
+
+
+@for(ta of tas; track ta){
+    <div class="bubble">
+        <a href="../chat"> {{ta}} </a>
+    </div>
+}
