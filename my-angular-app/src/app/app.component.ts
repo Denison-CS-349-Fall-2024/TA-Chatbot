@@ -1,13 +1,18 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { ChatComponent } from './components/chat/chat.component';
+import { initFlowbite } from 'flowbite';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, ChatComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
 export class AppComponent {
-  title = 'my-angular-app';
+  title: string = 'my-angular-app';
+  ngOnInit(): void {
+    initFlowbite();
+  }
 }
