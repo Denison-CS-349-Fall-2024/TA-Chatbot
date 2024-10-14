@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CreateClassComponent } from './create-class.component';
+import { AddTaPageComponent } from './add-ta-page.component';
 
-describe('CreateClassComponent', () => {
-  let component: CreateClassComponent;
-  let fixture: ComponentFixture<CreateClassComponent>;
+describe('AddTaPageComponent', () => {
+  let component: AddTaPageComponent;
+  let fixture: ComponentFixture<AddTaPageComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CreateClassComponent]
+      imports: [AddTaPageComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(CreateClassComponent);
+    fixture = TestBed.createComponent(AddTaPageComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
