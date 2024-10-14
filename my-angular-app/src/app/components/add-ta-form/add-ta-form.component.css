@@ -1,0 +1,59 @@
+*{
+    font-family:Arial, Helvetica, sans-serif
+}
+
+.lowered-Welcome-Text{
+    margin-left: 30px;
+    margin-top: 30px;
+}
+
+.textbox{
+    margin-left: 50px;
+}
+
+label{
+    margin-left: 50px;
+    display: block;
+}
+
+.lowered-Title{
+    margin-top: 20px;
+}
+
+h1{
+    font-size: 40px;
+    margin-left: 35px;
+    margin-top: 40px;
+    display: flex;
+    
+}
+
+.bubble {
+    background-color: #f0f0f0;  /* Light background for the bubble */
+    padding: 8px;              /* Padding inside the bubble */
+    border-radius: 10px;         /* Rounded corners to create the bubble effect */
+    display: inline-block;       /* Ensures the bubble is sized to the content */
+    width: fit-content;              /* Limits the width of the bubble */
+      /* Optional shadow for a 3D effect */
+    margin: 10px 0;              /* Add space around the bubble */
+    font-size: 16px;             /* Adjust text size */
+    color: #333;     
+    margin-left: 30px;            /* Text color */
+    display: block;  /* buttons are stacked vertically */
+    
+}  
+
+input[type="text"] {
+    width: 20%; /* Makes the text box full width */
+    padding: 8px; /* Adds padding inside the text box */
+    font-size: 16px; /* Increases the font size of the text inside */
+    border: 2px solid #ccc; /* Adds a border around the text box */
+    border-radius: 10px; /* Rounds the corners of the text box */
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow */
+    margin-bottom: 20px;
+}
+
+input[type="file"] {
+    margin-left: 50px;
+
+}
