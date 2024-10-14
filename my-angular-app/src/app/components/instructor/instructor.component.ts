@@ -9,8 +9,9 @@ import { CommonModule } from '@angular/common';  // Import CommonModule
   styleUrl: './instructor.component.css'
 })
 export class InstructorComponent {
-  classList: string[] = [];
 
+  public classList: string[] = ["CS 101", "CS 234"]
+  
   addClass(){
     const newClassNumber = this.classList.length + 1;
     this.classList.push(`Class ${newClassNumber}`);

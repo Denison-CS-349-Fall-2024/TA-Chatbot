@@ -9,5 +9,4 @@ import { InstructorComponent } from '../../components/instructor/instructor.comp
   styleUrl: './instructor-page.component.css'
 })
 export class InstructorPageComponent {
-
 }
