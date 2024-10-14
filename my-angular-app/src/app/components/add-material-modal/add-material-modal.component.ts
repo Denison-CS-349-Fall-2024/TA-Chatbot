@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { CourseService } from '../../services/course-service/course.service';
 
 @Component({
   selector: 'app-add-material-modal',
@@ -7,9 +8,7 @@ import { FormsModule } from '@angular/forms';
   imports: [FormsModule],
   template: `
     <!-- Modal toggle -->
-
     <button  data-modal-target="add-course-material-modal" data-modal-toggle="add-course-material-modal" type="button" class="block text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700">Add Course Material</button>
-
     <!-- Main modal -->
     <div id="add-course-material-modal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
         <div class="relative p-4 w-full max-w-lg max-h-full">
@@ -32,7 +31,7 @@ import { FormsModule } from '@angular/forms';
                     <div class="grid gap-4 mb-4 grid-cols-2">
                         <div class="col-span-2">
                             <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Name</label>
-                            <input type="text" name="name" id="name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Eg. Fall 2024 Syllabus">
+                            <input type="text" name="name" id="name" [(ngModel)]="this.materialName" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Eg. Fall 2024 Syllabus" autocomplete="off">
                         </div>
                         <div class="col-span-2">
                         <!-- sm:col-span-1 Add this above to make it half of the width -->
@@ -88,6 +87,9 @@ import { FormsModule } from '@angular/forms';
 })
 export class AddMaterialModalComponent {
   protected selectedFile: File | null = null;
+  protected materialName: string = "";
+
+  constructor(private courseService: CourseService) {}
 
   onFileSelect(event: Event) {
     const input = event.target as HTMLInputElement;
@@ -97,12 +99,12 @@ export class AddMaterialModalComponent {
     }
   }
 
-  onFileUpload() {
+  async onFileUpload() {
     if (this.selectedFile) {
       const formData = new FormData();
       formData.append('file', this.selectedFile, this.selectedFile.name);
-      console.log(this.selectedFile)
-      console.log(formData);
+      await this.addMaterial(this.materialName);
+
       // this.http.post('https://your-backend-api.com/upload', formData).subscribe(response => {
       //   console.log('File uploaded successfully', response);
       // }, error => {
@@ -111,5 +113,9 @@ export class AddMaterialModalComponent {
     } else {
       console.error('No file selected!');
     }
+  }
+
+  async addMaterial(fileName: string){
+    await this.courseService.addMaterial(fileName);
   }
 }

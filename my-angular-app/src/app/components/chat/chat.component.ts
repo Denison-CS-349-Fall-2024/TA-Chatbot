@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { ChatService, Message } from '../../services/chat-service.service';
+import { ChatService, Message } from '../../services/chat-service/chat.service';
 
 @Component({
   selector: 'app-chat',
