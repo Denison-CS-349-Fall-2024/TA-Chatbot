@@ -34,7 +34,8 @@ import { FormsModule } from '@angular/forms';
                             <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Name</label>
                             <input type="text" name="name" id="name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Eg. Fall 2024 Syllabus">
                         </div>
-                        <div class="col-span-2 sm:col-span-1">
+                        <div class="col-span-2">
+                        <!-- sm:col-span-1 Add this above to make it half of the width -->
                             <label for="upload-type" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Type</label>
                             <select id="upload-type" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
                                 <option selected="">Select type</option>
@@ -43,17 +44,6 @@ import { FormsModule } from '@angular/forms';
                                 <option value="quiz">Quiz</option>
                                 <option value="readings">Reading Question</option>
                             </select>
-                        </div>
-                        <div class="col-span-2 sm:col-span-1 flex items-center mt-3">
-                            <div class="flex">
-                                <div class="flex items-center h-5">
-                                    <input id="helper-checkbox" aria-describedby="helper-checkbox-text" type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                                </div>
-                                <div class="ms-2 text-sm">
-                                    <label for="helper-checkbox" class="font-medium text-gray-900 dark:text-gray-300">Enable file</label>
-                                    <p id="helper-checkbox-text" class="text-xs font-normal text-gray-500 dark:text-gray-300">Allow the chatbot to answer questions using this file</p>
-                                </div>
-                            </div>
                         </div>
                         <div class="col-span-2">
                           <div class="flex items-center justify-center w-full">
@@ -75,7 +65,19 @@ import { FormsModule } from '@angular/forms';
                           Selected file: {{ this.selectedFile.name}}
                         </div>
                     }
-                    <button type="submit" class="w-full text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700">Upload</button>
+                    <div class="col-span-2 sm:col-span-1 flex items-center mt-3">
+                            <div class="flex">
+                                <div class="flex items-center h-5">
+                                    <input id="helper-checkbox" aria-describedby="helper-checkbox-text" type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                </div>
+                                <div class="ms-2 text-sm">
+                                    <label for="helper-checkbox" class="font-medium text-gray-900 dark:text-gray-300">Enable file</label>
+                                    <p id="helper-checkbox-text" class="text-xs font-normal text-gray-500 dark:text-gray-300">Allow the chatbot to answer questions using this file</p>
+                                </div>
+                            </div>
+                      </div>
+
+                    <button data-modal-target="add-course-material-modal" data-modal-toggle="add-course-material-modal" type="submit" class="mt-5 w-full text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700">Upload</button>
                  </form>
             </div>
         </div>
@@ -87,7 +89,7 @@ import { FormsModule } from '@angular/forms';
 export class AddMaterialModalComponent {
   protected selectedFile: File | null = null;
 
-  onFileSelect (event: Event) {
+  onFileSelect(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
       this.selectedFile = input.files[0];
@@ -95,7 +97,7 @@ export class AddMaterialModalComponent {
     }
   }
 
-  onFileUpload()  {
+  onFileUpload() {
     if (this.selectedFile) {
       const formData = new FormData();
       formData.append('file', this.selectedFile, this.selectedFile.name);

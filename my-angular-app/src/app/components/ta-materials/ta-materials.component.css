@@ -1,0 +1,12 @@
+.bubble {
+    background-color: #f0f0f0;  /* Light background for the bubble */
+    padding: 8px;              /* Padding inside the bubble */
+    border-radius: 10px;         /* Rounded corners to create the bubble effect */
+    width: fit-content;              /* Limits the width of the bubble */
+      /* Optional shadow for a 3D effect */
+    margin: 10px 0;              /* Add space around the bubble */
+    font-size: 16px;             /* Adjust text size */
+    color: #333;     
+    display: block;  /* buttons are stacked vertically */
+    
+}  
