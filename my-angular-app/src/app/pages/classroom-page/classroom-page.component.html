@@ -1,4 +1,12 @@
-<h1 class="mb-2"><b>CS349: Software Engineering</b> <button class="bubble ">Switch to Student view</button></h1>
-<div class="ml-[50px]">
-    <app-ta-materials />
+<div class="w-[30vw]">
+  <h1 class="mb-2"><b>
+      @if(courseAndSection !== null){
+        {{ this.courseAndSection.toUpperCase()}}
+        }@else{
+          CS349-01
+      }
+    </b> <button class="bubble ">Switch to Student view</button></h1>
+  <div class="ml-[50px]">
+      <app-ta-materials />
+  </div>
 </div>

@@ -13,16 +13,27 @@ import { CourseService } from '../../services/course-service/course.service';
 export class TaMaterialsComponent {
 
   protected materialSubscription!: Subscription;
-
   protected materials!: string[];
+  protected fileSelectedToDelete: number | null = null;
 
   constructor(private courseService: CourseService) {
-    
+
   }
 
   ngOnInit(){
     this.materialSubscription = this.courseService.materials$.subscribe(materials => {
       this.materials = materials
     })
+  }
+
+  deleteMaterial(){
+    if (this.fileSelectedToDelete !== null){
+      this.courseService.deleteMaterial(this.fileSelectedToDelete);
+      this.fileSelectedToDelete = null;
+    }
+  }
+
+  setFileSelectedToDelete(index: number){
+    this.fileSelectedToDelete = index;
   }
 }

@@ -95,7 +95,6 @@ export class AddMaterialModalComponent {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
       this.selectedFile = input.files[0];
-      console.log('Selected file:', this.selectedFile);
     }
   }
 
@@ -104,8 +103,12 @@ export class AddMaterialModalComponent {
       const formData = new FormData();
       formData.append('file', this.selectedFile, this.selectedFile.name);
       await this.addMaterial(this.materialName);
-
+      formData.forEach((value, key) => {
+      console.log(key, value);
+    });
       // this.http.post('https://your-backend-api.com/upload', formData).subscribe(response => {
+    //
+    //
       //   console.log('File uploaded successfully', response);
       // }, error => {
       //   console.error('File upload failed', error);

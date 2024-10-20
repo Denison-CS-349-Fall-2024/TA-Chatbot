@@ -1,5 +1,8 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';  // Import CommonModule
+import { Course } from '../../types/coursetypes';
+import { Subscription } from 'rxjs';
+import { CourseService } from '../../services/course-service/course.service';
 
 @Component({
   selector: 'app-instructor',
@@ -10,11 +13,15 @@ import { CommonModule } from '@angular/common';  // Import CommonModule
 })
 export class InstructorComponent {
 
-  public classList: string[] = ["CS 101", "CS 234"]
-  
-  addClass(){
-    const newClassNumber = this.classList.length + 1;
-    this.classList.push(`Class ${newClassNumber}`);
+  protected courses!: Course[];
+  protected coursesSubscription!: Subscription;
+
+  constructor(private courseService: CourseService){}
+
+  ngOnInit(){
+    this.coursesSubscription = this.courseService.courses$.subscribe(courses => {
+      this.courses = courses;
+    })
   }
 
 }

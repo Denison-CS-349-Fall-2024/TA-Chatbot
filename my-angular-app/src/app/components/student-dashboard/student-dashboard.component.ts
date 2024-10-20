@@ -1,5 +1,8 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';  // Import CommonModule
+import { Course } from '../../types/coursetypes';
+import { CourseService } from '../../services/course-service/course.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-student-dashboard',
@@ -9,7 +12,17 @@ import { CommonModule } from '@angular/common';  // Import CommonModule
   styleUrl: './student-dashboard.component.css'
 })
 export class StudentDashboardComponent {
-  public tas: string[] = ["CS 101", "CS 234", "CS 349"]
   public student: string = "Liam"
+
+  protected courses!: Course[];
+  protected coursesSubscription!: Subscription;
+
+  constructor(private courseService: CourseService){}
+
+  ngOnInit(){
+    this.coursesSubscription = this.courseService.courses$.subscribe(courses => {
+      this.courses = courses;
+    })
+  }
 }
 

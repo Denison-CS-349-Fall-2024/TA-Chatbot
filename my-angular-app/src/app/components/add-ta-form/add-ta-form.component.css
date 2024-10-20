@@ -2,17 +2,7 @@
     font-family:Arial, Helvetica, sans-serif
 }
 
-.lowered-Welcome-Text{
-    margin-left: 30px;
-    margin-top: 30px;
-}
-
-.textbox{
-    margin-left: 50px;
-}
-
 label{
-    margin-left: 50px;
     display: block;
 }
 
@@ -22,10 +12,8 @@ label{
 
 h1{
     font-size: 40px;
-    margin-left: 35px;
-    margin-top: 40px;
     display: flex;
-    
+
 }
 
 .bubble {
@@ -37,11 +25,11 @@ h1{
       /* Optional shadow for a 3D effect */
     margin: 10px 0;              /* Add space around the bubble */
     font-size: 16px;             /* Adjust text size */
-    color: #333;     
+    color: #333;
     margin-left: 30px;            /* Text color */
     display: block;  /* buttons are stacked vertically */
-    
-}  
+
+}
 
 input[type="text"] {
     width: 20%; /* Makes the text box full width */

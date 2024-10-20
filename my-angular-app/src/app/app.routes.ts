@@ -7,10 +7,12 @@ import { ClassroomPageComponent } from './pages/classroom-page/classroom-page.co
 import { StudentDashboardPageComponent } from './pages/student-dashboard-page/student-dashboard-page.component';
 
 export const routes: Routes = [
-  {path: 'chat', component: ChatPageComponent},
   {path: '', component: LandingPageComponent},
-  {path: 'instructor', component: InstructorPageComponent},
+  {path: 'chat', component: ChatPageComponent},
+  {path: 'chat/:semester/:courseAndSection', component: ChatPageComponent},
+  {path: 'instructor-dashboard', component: InstructorPageComponent},
   {path: 'add-ta', component: AddTaPageComponent},
   {path: 'classroom', component: ClassroomPageComponent},
+  {path: 'classroom/:semester/:courseAndSection', component: ClassroomPageComponent},
   {path: 'student-dashboard', component: StudentDashboardPageComponent}
 ];
