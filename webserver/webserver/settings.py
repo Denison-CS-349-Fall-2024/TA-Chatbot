@@ -37,6 +37,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'user_management',         # Handles user authentication and roles
+    'class_management',        # Manages classes and pins
+    'chatbot_management',      # Handles chatbot interactions
+    'material_management',     # Manages uploaded materials
 ]
 
 MIDDLEWARE = [
