@@ -1,18 +1,17 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';  // Import CommonModule
 import { Course } from '../../types/coursetypes';
-import { CourseService } from '../../services/course-service/course.service';
 import { Subscription } from 'rxjs';
+import { CourseService } from '../../services/course-service/course.service';
 
 @Component({
-  selector: 'app-student-dashboard',
+  selector: 'app-instructor',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './student-dashboard.component.html',
-  styleUrl: './student-dashboard.component.css'
+  templateUrl: './instructor.component.html',
+  styleUrl: './instructor.component.css'
 })
-export class StudentDashboardComponent {
-  public student: string = "Liam"
+export class InstructorComponent {
 
   protected courses!: Course[];
   protected coursesSubscription!: Subscription;
@@ -24,5 +23,5 @@ export class StudentDashboardComponent {
       this.courses = courses;
     })
   }
-}
 
+}
