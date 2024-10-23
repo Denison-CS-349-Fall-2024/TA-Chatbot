@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: ta_chatbot_db  # This should create the DB on first run
+      POSTGRES_USER: postgres       # Optional but explicit; default is 'postgres'
+      POSTGRES_PASSWORD: example
+    volumes:
+      - pgdata:/var/lib/postgresql/data  # This is a named volume, preserving DB data
+    ports:
+      - "5432:5432"
+ 
+volumes:
+  pgdata:

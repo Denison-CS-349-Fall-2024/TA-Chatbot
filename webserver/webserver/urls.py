@@ -16,8 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from user_management import views
 
 urlpatterns = [
     path("api/chat/", include("chat.urls")),
     path('admin/', admin.site.urls),
+    path('accounts/', include('allauth.urls')),
+    path('accounts/profile/', views.profile, name="profile"),
+
 ]
