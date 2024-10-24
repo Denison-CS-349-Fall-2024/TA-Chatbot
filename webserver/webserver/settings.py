@@ -41,8 +41,9 @@ INSTALLED_APPS = [
     'class_management',        # Manages classes and pins
     'chatbot_management',      # Handles chatbot interactions
     'material_management',     # Manages uploaded materials
+    'rest_framework',
 ]
-
+AUTH_USER_MODEL = 'user_management.User'
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -81,6 +82,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+         'TEST': {
+            'NAME': BASE_DIR / 'test_db.sqlite3',
+        }
     }
 }
 
