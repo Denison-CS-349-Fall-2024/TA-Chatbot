@@ -28,8 +28,7 @@ def getuser(request):
     user = request.user
     if user.is_authenticated:
         response_data = {
-            "user": user.username,
-            "userName": user.get_full_name() or user.first_name,  # Ensure you provide a fallback
+            "user": user.email,
         }
         return JsonResponse(response_data)
     
@@ -41,4 +40,5 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     path('accounts/profile/', views.profile, name="profile"),
     path("getuser/", getuser, name="getuser"),
+    path('api/users/', include('user_management.urls')),  # Include user management URLs
 ]

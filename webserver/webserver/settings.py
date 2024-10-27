@@ -46,14 +46,16 @@ INSTALLED_APPS = [
     'chatbot_management',      # Handles chatbot interactions
     'material_management',     # Manages uploaded materials
     "corsheaders",
+    
     # For authentication:
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
 
+    'rest_framework',
 ]
-
+AUTH_USER_MODEL = 'user_management.User'
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
@@ -170,11 +172,13 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-ACCOUNT_ADAPTER = 'user_management.adapters.MyAccountAdapter'
+# ACCOUNT_ADAPTER = 'user_management.adapters.MyAccountAdapter'
 
 
 ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USER_MODEL_USERNAME_FIELD = 'email'
+
 # ACCOUNT_LOGOUT_REDIRECT_URL = 'shashank-logout-test'
 LOGIN_REDIRECT_URL = 'http://127.0.0.1:4200/'
 # LOGIN_REDIRECT_URL = 'get-csrf-token/'
