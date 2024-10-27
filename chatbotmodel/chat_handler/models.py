@@ -1,3 +1,4 @@
+#thia file define our model, ChatSession
 from django.db import models
 
 class ChatSession(models.Model):

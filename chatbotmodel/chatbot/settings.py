@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'chat_handler',
+    'chat_handler', #added our app to installed apps
 ]
 
 MIDDLEWARE = [
