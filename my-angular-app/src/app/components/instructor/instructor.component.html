@@ -1,7 +1,7 @@
 <div>
-  <p class="lowered-Welcome-Text">Hello Instructor!</p>
+  <p class="lowered-Welcome-Text"><b>Hello Instructor!</b></p>
 
-  <h1><b>Classrooms</b></h1>
+  <h1>Classrooms:</h1>
 
   <a [href] ="'/classroom/' + class.semester + '/' + class.department + class.courseNumber + '-' + class.section" *ngFor="let class of courses" class="bubble">{{ class.department.toUpperCase() + " " + class.courseNumber + "-" + class.section }}</a>
   <div><a class="bubble " href="add-ta">Add Class</a>
