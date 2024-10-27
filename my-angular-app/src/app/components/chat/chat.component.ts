@@ -30,8 +30,12 @@ export class ChatComponent {
 
 
   sendMessage(event: Event) {
+    if(this.userInput === "" || this.userInput.trim() === ""){
+      return;
+    }
     event.preventDefault();
     this.chatService.addMessage({ isSentByUser: true, content: this.userInput });
     this.userInput = "";
   }
+  
 }

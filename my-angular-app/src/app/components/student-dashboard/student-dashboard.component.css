@@ -3,8 +3,9 @@
 }
 
 .lowered-Welcome-Text{
-    margin-left: 30px;
-    margin-top: 30px;
+    font-size: 40px;
+    margin-left: 35px;
+    margin-top: 20px;
 }
 
 .lowered-Title{
@@ -14,7 +15,7 @@
 h1{
     font-size: 40px;
     margin-left: 35px;
-    margin-top: 40px;
+    margin-top: 10px;
     
 }
 
@@ -29,6 +30,22 @@ h1{
     font-size: 16px;             /* Adjust text size */
     color: #333;     
     margin-left: 30px;            /* Text color */
+    display: block;  /* buttons are stacked vertically */
+    
+}  
+
+.bubble2{
+    background-color: #f0f0f0;  /* Light background for the bubble */
+    padding: 8px;              /* Padding inside the bubble */
+    border-radius: 10px;         /* Rounded corners to create the bubble effect */
+    display: inline-block;       /* Ensures the bubble is sized to the content */
+    width: fit-content;              /* Limits the width of the bubble */
+      /* Optional shadow for a 3D effect */
+    margin: 10px 0;              /* Add space around the bubble */
+    font-size: 16px;             /* Adjust text size */
+    color: #333;     
+    margin-left: 30px;            /* Text color */
+    margin-top: 30px;
     display: block;  /* buttons are stacked vertically */
     
 }  
