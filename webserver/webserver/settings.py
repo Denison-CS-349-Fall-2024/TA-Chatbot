@@ -45,15 +45,17 @@ INSTALLED_APPS = [
     'class_management',        # Manages classes and pins
     'chatbot_management',      # Handles chatbot interactions
     'material_management',     # Manages uploaded materials
-
+    "corsheaders",
     # For authentication:
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -63,7 +65,10 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     'allauth.account.middleware.AccountMiddleware',
+]
 
+CSRF_TRUSTED_ORIGINS = [
+    "http://127.0.0.1:4200",
 ]
 
 ROOT_URLCONF = 'webserver.urls'
@@ -165,8 +170,27 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+ACCOUNT_ADAPTER = 'user_management.adapters.MyAccountAdapter'
+
 
 ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_EMAIL_REQUIRED = True
 # ACCOUNT_LOGOUT_REDIRECT_URL = 'shashank-logout-test'
-# LOGIN_REDIRECT_URL = 'shashank-test'
+LOGIN_REDIRECT_URL = 'http://127.0.0.1:4200/'
+# LOGIN_REDIRECT_URL = 'get-csrf-token/'
+
+# Allow your Angular app’s origin
+CORS_ALLOWED_ORIGINS = [
+    "http://127.0.0.1:4200",
+]
+CORS_ALLOW_CREDENTIALS = True
+
+# Enable sending cookies with CORS
+# CORS_ALLOW_CREDENTIALS = True
+
+# # Configure session cookie to be accessible across localhost ports
+# SESSION_COOKIE_SAMESITE = 'None'  # Required for cross-site cookies in modern browsers
+# SESSION_COOKIE_SECURE = False     # Set to True if using HTTPS in production
+
+# Set the session cookie domain to allow sharing between ports
+# SESSION_COOKIE_DOMAIN = "localhost"  # Ensures the cookie works across localhost subdomains
