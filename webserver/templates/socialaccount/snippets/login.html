@@ -1,0 +1,31 @@
+{% load i18n %}
+{% load allauth %}
+{% load socialaccount %}
+{% get_providers as socialaccount_providers %}
+{% if socialaccount_providers %}
+    {% if not SOCIALACCOUNT_ONLY %}
+        {% element hr %}
+        {% endelement %}
+        {% element h2 %}
+            {% translate "Or use a third-party" %}
+        {% endelement %}
+    {% endif %}
+
+
+{% load allauth socialaccount %}
+{% get_providers as socialaccount_providers %}
+{% if socialaccount_providers %}
+    {% element provider_list %}
+        {% for provider in socialaccount_providers %}
+            {% provider_login_url provider process=process scope=scope auth_params=auth_params as href %} 
+            <a href="{{ href }}" class="social-login-btn {{ provider.id }}-btn">
+                Sign in with {{ provider.name }}
+            </a>
+        {% endfor %}
+    {% endelement %}
+{% endif %}
+
+    {% include "socialaccount/snippets/login_extra.html" %}
+
+{% endif %}
+

@@ -11,7 +11,11 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import environ
+import os
 
+env = environ.Env()
+env.read_env(env.str("ENV_PATH", "./.env"))
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -67,7 +71,8 @@ ROOT_URLCONF = 'webserver.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -146,6 +151,11 @@ AUTHENTICATION_BACKENDS = [
 
 SOCIALACCOUNT_PROVIDERS = {
     "google": {
+        "APP": {
+            'client_id': env("GOOGLE_CLIENT_ID"),
+            'secret': env('GOOGLE_SECRET'),
+            'key': ''
+        },
         "SCOPE": [
             "profile",
             "email",
@@ -158,3 +168,5 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_EMAIL_REQUIRED = True
+# ACCOUNT_LOGOUT_REDIRECT_URL = 'shashank-logout-test'
+# LOGIN_REDIRECT_URL = 'shashank-test'
