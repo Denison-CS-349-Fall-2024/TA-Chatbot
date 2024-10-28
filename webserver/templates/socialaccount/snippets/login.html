@@ -5,9 +5,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Title</title>
+    <title>Sign </title>
     <link rel="stylesheet" href="{% static 'auth/styles.css' %}">
     <style>
+
+.main-container {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #f7fafc; 
+    }
+
+
+    .modal {
+      background-color: #ffffff; 
+      border-radius: 1rem; 
+      box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+      padding: 2rem;
+      width: 90%;
+      max-width: 500px;
+      text-align: center;
+    }
         .gsi-material-button {
   -moz-user-select: none;
   -webkit-user-select: none;
@@ -118,6 +138,14 @@
 .social-login-btn:active{
     text-decoration: none;
 }
+ul {
+  padding-inline-start: 0px;
+
+}
+.modal-header{
+
+  margin-bottom: 2rem;
+}
 
     </style>
 </head>
@@ -128,26 +156,23 @@
 {% load socialaccount %}
 {% get_providers as socialaccount_providers %}
 {% if socialaccount_providers %}
-    <!-- {% if not SOCIALACCOUNT_ONLY %}
-        {% element hr %}
-        {% endelement %}
-        {% element h2 %}
-            {% translate "Or use a third-party" %}
-        {% endelement %}
-    {% endif %} -->
+
 
 
 {% load allauth socialaccount %}
 {% get_providers as socialaccount_providers %}
 {% if socialaccount_providers %}
+    <div class="main-container">
+      <div class="modal">
+        <div class="modal-header">
+          <h3>Sign in</h3>
+        </div>
     {% element provider_list %}
         {% for provider in socialaccount_providers %}
             {% provider_login_url provider process=process scope=scope auth_params=auth_params as href %} 
-            <!-- <a href="{{ href }}&testing={{ request.GET.userType }}" class="social-login-btn {{ provider.id }}-btn"">
-                Sign in with {{ provider.name }}
-            </a> -->
-            <button class="gsi-material-button" style="width:40">
-                <a href="{{ href }}&testing={{ request.GET.userType }}" class="social-login-btn {{ provider.id }}-btn"">
+
+            <button class="gsi-material-button" style="width:100">
+                <a href="{{ href }}&testing={{ request.GET.userType }}" class="social-login-btn {{ provider.id }}-btn">
                 <div class="gsi-material-button-state"></div>
                 <div class="gsi-material-button-content-wrapper">
                   <div class="gsi-material-button-icon">
@@ -159,14 +184,16 @@
                       <path fill="none" d="M0 0h48v48H0z"></path>
                     </svg>
                   </div>
-                  <span class="gsi-material-button-contents">Sign in with Google</span>
-                  <span style="display: none;">Sign in with Google</span>
+                  <span class="gsi-material-button-contents">Google</span>
+                  <span style="display: none;">Google</span>
                 </div>
                 </a>
-
               </button>
+
         {% endfor %}
     {% endelement %}
+            </div>
+    </div>
 {% endif %}
 
     {% include "socialaccount/snippets/login_extra.html" %}
