@@ -11,7 +11,11 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import environ
+import os
 
+env = environ.Env()
+env.read_env(env.str("ENV_PATH", "./.env"))
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -37,13 +41,24 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'user_management',         # Handles user authentication and roles
+
+    'user_management',
     'class_management',        # Manages classes and pins
     'chatbot_management',      # Handles chatbot interactions
     'material_management',     # Manages uploaded materials
-]
+    "corsheaders",
+    
+    # For authentication:
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
 
+    'rest_framework',
+]
+AUTH_USER_MODEL = 'user_management.User'
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -51,6 +66,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'allauth.account.middleware.AccountMiddleware',
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://127.0.0.1:4200",
 ]
 
 ROOT_URLCONF = 'webserver.urls'
@@ -58,7 +79,8 @@ ROOT_URLCONF = 'webserver.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -79,8 +101,12 @@ WSGI_APPLICATION = 'webserver.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'ta_chatbot_db',
+        'USER': 'postgres',
+        'PASSWORD': 'example',
+        'HOST': 'localhost',  # Use the service name from docker-compose.yml
+        'PORT': '5432',
     }
 }
 
@@ -125,3 +151,42 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend'
+]
+
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        "APP": {
+            'client_id': env("GOOGLE_CLIENT_ID"),
+            'secret': env('GOOGLE_SECRET'),
+            'key': ''
+        },
+        "SCOPE": [
+            "profile",
+            "email",
+        ],
+        "AUTH_PARAMS": {"access_type": "online"}
+    }
+}
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+SOCIALACCOUNT_ADAPTER = 'user_management.adapters.CustomSocialAccountAdapter'
+# ACCOUNT_ADAPTER = "user_management.adapters.CustomAccountAdapter"
+
+
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USER_MODEL_USERNAME_FIELD = 'email'
+
+# ACCOUNT_LOGOUT_REDIRECT_URL = 'shashank-logout-test'
+LOGIN_REDIRECT_URL = 'http://127.0.0.1:4200/'
+# LOGIN_REDIRECT_URL = 'get-csrf-token/'
+
+# Allow your Angular app’s origin
+CORS_ALLOWED_ORIGINS = [
+    "http://127.0.0.1:4200",
+]
+CORS_ALLOW_CREDENTIALS = True

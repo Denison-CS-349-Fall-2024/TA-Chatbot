@@ -9,7 +9,7 @@ from django.http import JsonResponse
 
 # Load environment variables from .env file
 load_dotenv()
-
+print("this is the api key:", os.getenv("OPENAI_API_KEY"))
 # Initialize OpenAI client with API key from environment variable
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
@@ -98,7 +98,7 @@ def process_pdf_and_query(query, chunk_size=250, chunk_overlap=50, top_k=5):
     completion = client.chat.completions.create(
         model="gpt-4o",
         messages=[
-            {"role": "system", "content": "You are a helpful, friendly assistant to CS 351 - Software Engineering, helping students by answering class related questions or referring them to the professor's email if you can't answer the question"},
+            {"role": "system", "content": "You are a helpful, friendly assistant to CS 349 - Software Engineering, helping students by answering class related questions or referring them to the professor's email if you can't answer the question"},
             {
                 "role": "user",
                 "content": f"""A student asked the following question:

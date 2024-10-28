@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { ChatService, Message } from '../../services/chat-service.service';
+import { ChatService, Message } from '../../services/chat-service/chat.service';
 
 @Component({
   selector: 'app-chat',
@@ -13,6 +13,8 @@ import { ChatService, Message } from '../../services/chat-service.service';
 })
 export class ChatComponent {
 
+  @Input() semester: string | null = null;
+  @Input() courseAndSection!: string | null
   constructor(private chatService: ChatService) {}
 
   public messagesSubscription!: Subscription;
@@ -28,8 +30,12 @@ export class ChatComponent {
 
 
   sendMessage(event: Event) {
+    if(this.userInput === "" || this.userInput.trim() === ""){
+      return;
+    }
     event.preventDefault();
     this.chatService.addMessage({ isSentByUser: true, content: this.userInput });
     this.userInput = "";
   }
+  
 }

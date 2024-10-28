@@ -1,1 +1,11 @@
-<p>student-dashboard works!</p>
+<p class="lowered-Welcome-Text"><b>Hello {{student}}!</b></p>
+
+<h1>Your TAs:</h1>
+
+@for (course of courses; track course){
+    <div class="bubble">
+      <a [href]="'chat/'+course.semester + '/' + course.department +  course.courseNumber + '-' + course.section"> {{course.department+" "+ course.courseNumber}} </a>
+    </div>
+}
+
+<div><a class="bubble2" href="instructor-dashboard">Not a student? Go to Instructor Dashboard</a>
