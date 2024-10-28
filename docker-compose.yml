@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: ta_chatbot_db
+      POSTGRES_USER: postgres    
+      POSTGRES_PASSWORD: example
+    volumes:
+      - pgdata:/var/lib/postgresql/data 
+    ports:
+      - "5432:5432"
+ 
+volumes:
+  pgdata:

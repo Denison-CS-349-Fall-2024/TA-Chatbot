@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
@@ -22,7 +23,7 @@ export class ChatService {
 
   public messages$ = this.messagesSource.asObservable(); //Observables are what components listen to, observable variables should have $ sign in the variable name.
 
-  constructor() {
+  constructor(private http: HttpClient) {
 
   }
 
@@ -34,5 +35,13 @@ export class ChatService {
   async addMessage(newMessage: Message) {
     //TODO: Once the backend is up, send a asynchronous call to the backend to create a new message.
     this.messagesSource.next([...this.messagesSource.getValue(), newMessage]);
+    console.log(`http://127.0.0.1:8000/api/chat/query/?question=${encodeURIComponent(newMessage.content)}`);
+    this.http.get(`http://127.0.0.1:8000/api/chat/query/?question=${encodeURIComponent(newMessage.content)}`).subscribe(res =>{
+
+      //@ts-ignore
+      this.messagesSource.next([...this.messagesSource.getValue(), {content: res.response, isSentByUser: false}]);
+    }
+    )
+    ;
   }
 }

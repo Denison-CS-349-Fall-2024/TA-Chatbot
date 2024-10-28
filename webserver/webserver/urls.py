@@ -16,8 +16,30 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from user_management import views
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.http import JsonResponse
+from django.shortcuts import redirect
+
+
+def getuser(request):
+    # redirect_url = f"http://localhost:4200?session_token={ request.session.session_key }"
+    # return redirect(redirect_url)
+    user = request.user
+    if user.is_authenticated:
+        response_data = {
+            "user": user.email,
+            "isProfessor": user.is_prof
+        }
+        return JsonResponse(response_data)
+    
+    return JsonResponse({"error": "User not authenticated"}, status=401)  # Handle the case where user is not authenticated
 
 urlpatterns = [
-    path("api/chat/", include("chat.urls")),
     path('admin/', admin.site.urls),
+    path('api/chat/',include("chatbot_management.urls")),
+    path('accounts/', include('allauth.urls')),
+    path('accounts/profile/', views.profile, name="profile"),
+    path("getuser/", getuser, name="getuser"),
+    path('api/users/', include('user_management.urls')),  # Include user management URLs
 ]
