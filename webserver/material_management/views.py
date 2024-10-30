@@ -28,7 +28,7 @@ def put_material(request, title):
         form = CourseMaterialForm(request.POST, request.FILES, instance=material)
         if form.is_valid():
             form.save()
-            return redirect('course_materials', title=material.title)
+            return redirect('get_materials')
     else:
         form = CourseMaterialForm(instance=material)
     return render(request, 'put_material.html', {'form': form, 'material': material})
@@ -38,5 +38,5 @@ def delete_material(request, title):
     material = get_object_or_404(CourseMaterial, title=title)
     if request.method == 'POST':
         material.delete()
-        return redirect('course_materials', title=material.title)
+        return redirect('get_materials')
     return render(request, 'confirm_delete.html', {'material': material})
