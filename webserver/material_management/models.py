@@ -1,4 +1,5 @@
 from django.db import models
+from django.forms import ModelForm
 from class_management.models import Course
 
 class CourseMaterial(models.Model):
@@ -9,3 +10,8 @@ class CourseMaterial(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='materials')
     def __str__(self):
         return self.title
+
+class CourseMaterialForm(forms.ModelForm):
+    class Meta:
+        model = CourseMaterial
+        fields = ['title', 'course', 'category']
