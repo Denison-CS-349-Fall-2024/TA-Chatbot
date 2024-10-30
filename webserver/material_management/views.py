@@ -18,8 +18,8 @@ def get_materials(request):
     return render(request, 'get_materials.html', {'materials': materials})
 
 def get_material(request, title):
-    materials = CourseMaterial.objects.filter(title=title)
-    return render(request, 'get_material.html', {'materials': materials})
+    material = CourseMaterial.objects.filter(title=title)
+    return render(request, 'get_material.html', {'material': material})
 
 # Update (PUT)
 def put_material(request, title):
