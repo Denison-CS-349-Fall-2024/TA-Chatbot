@@ -181,8 +181,7 @@ ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USER_MODEL_USERNAME_FIELD = 'email'
 
-# ACCOUNT_LOGOUT_REDIRECT_URL = 'shashank-logout-test'
-LOGIN_REDIRECT_URL = 'http://127.0.0.1:4200/'
+LOGIN_REDIRECT_URL = 'http://127.0.0.1:4200/instructor-dashboard/'
 # LOGIN_REDIRECT_URL = 'get-csrf-token/'
 
 # Allow your Angular app’s origin

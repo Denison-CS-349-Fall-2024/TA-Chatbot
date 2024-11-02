@@ -28,8 +28,9 @@ def getuser(request):
     user = request.user
     if user.is_authenticated:
         response_data = {
-            "user": user.email,
-            "isProfessor": user.is_prof
+            "email": user.email,
+            "isProf": user.is_prof,
+            "name": user.name
         }
         return JsonResponse(response_data)
     

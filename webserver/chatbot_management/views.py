@@ -9,7 +9,6 @@ from django.http import JsonResponse
 
 # Load environment variables from .env file
 load_dotenv()
-print("this is the api key:", os.getenv("OPENAI_API_KEY"))
 # Initialize OpenAI client with API key from environment variable
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 

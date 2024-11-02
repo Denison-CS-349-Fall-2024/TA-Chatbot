@@ -10,8 +10,6 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
 
         # Call the original populate_user to maintain normal behavior
         user = super().populate_user(request, sociallogin, data)
-        print(userType)
-        print(userType == "instructor")
         # Optionally set fields based on the decoded user type
         if userType == 'instructor':
             user.is_prof = True
@@ -19,5 +17,6 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         else:
             user.is_prof = False
             user.is_staff = False
-        print(user)
+
+        user.name = data['first_name'] 
         return user
