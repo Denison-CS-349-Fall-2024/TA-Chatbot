@@ -29,14 +29,15 @@ def getuser(request):
     if user.is_authenticated:
         response_data = {
             "user": user.email,
+            "isProfessor": user.is_prof
         }
         return JsonResponse(response_data)
     
     return JsonResponse({"error": "User not authenticated"}, status=401)  # Handle the case where user is not authenticated
 
 urlpatterns = [
-    path("api/chat/", include("chat.urls")),
     path('admin/', admin.site.urls),
+    path('api/chat/',include("chatbot_management.urls")),
     path('accounts/', include('allauth.urls')),
     path('accounts/profile/', views.profile, name="profile"),
     path("getuser/", getuser, name="getuser"),
