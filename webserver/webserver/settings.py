@@ -20,6 +20,10 @@ env.read_env(env.str("ENV_PATH", "./.env"))
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+MEDIA_ROOT = os.path.join(BASE_DIR, 'uploads')
+MEDIA_URL = '/uploads/'
+
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 

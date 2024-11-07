@@ -14,6 +14,16 @@ class CourseManager(models.Manager):
             return True
         except Course.DoesNotExist:
             return False
+        
+    def get_course(self, course_id):
+        try:
+            course = self.get(id = course_id)
+
+            return course
+        
+        except Course.DoesNotExist:
+            return ValueError("Invalid Course ID")
+
 
 
 class Course(models.Model):

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, catchError, Observable, of, tap } from 'rxjs';
 import { Course } from '../../types/coursetypes';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -45,11 +46,43 @@ export class CourseService {
   public materials$ = this.materialsSource.asObservable();
   public courses$ = this.coursesSource.asObservable();
 
-  constructor() { }
+  constructor(private http: HttpClient) { }
 
   async addCourse() {
     //TODO: add a new course in the backend.
+      // console.log("the function is called");
+      // this.http.post<any[]>("http://127.0.0.1:8000/class_management/courses/create/", {
+        
+      // }).pipe(
+      //   tap(res => console.log(res)),
+      //   catchError(error => {console.error(error)
+      //     return of([])
+      //   })
+      // ).subscribe()
 
+      console.log("The function is called");
+
+  try {
+    const response = await this.http.post<any[]>(
+      "http://127.0.0.1:8000/class_management/courses/create/",
+      {
+        name: "SOftware engineering",
+        pin: "1234",
+        section: "01",
+        professor_id: "2"
+      }  
+    ).pipe(
+      tap(res => console.log("Response:", res)),
+      catchError(error => {
+        console.error("Error:", error);
+        return of([]);  // Return an empty array if there’s an error
+      })
+    ).toPromise();
+
+    console.log("Course added successfully:", response);
+  } catch (error) {
+    console.error("Failed to add course:", error);
+  }
   }
 
   async getCourse(email: string) {
@@ -65,6 +98,7 @@ export class CourseService {
   }
   async addMaterial(newMaterial: string) {
     //TODO: Once the backend is up, send a asynchronous call to the backend to create a new message.
+
     this.materialsSource.next([...this.materialsSource.getValue(), newMaterial]);
   }
 
@@ -77,4 +111,30 @@ export class CourseService {
       this.materialsSource.next(newArray);
     }
   }
+
+  async uploadFile(file: File, fileType: string) {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('fileName', file.name);
+    formData.append("materialType", fileType)
+    
+    await this.http.post("http://127.0.0.1:8000/api/materials/add-material/", formData, {
+      headers: new HttpHeaders({ 'X-CSRFToken': this.getCSRFToken() }),
+      withCredentials: true
+    }).pipe(
+      tap(res => console.log("Response:", res)),
+      catchError(error => {
+        console.error("Error:", error);
+        return of([]);  // Return an empty array if there’s an error
+      })
+    ).toPromise();
+  }
+
+  private getCSRFToken(): string {
+    return document.cookie
+      .split('; ')
+      .find(row => row.startsWith('csrftoken='))
+      ?.split('=')[1] || '';
+  }
+
 }

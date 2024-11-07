@@ -3,7 +3,7 @@
       <p class="lowered-Welcome-Text">Hello Instructor!</p>
 
       <h1 class="truncate"><b>New TA Setup</b><a class="bubble hover:cursor-pointer">Create</a></h1>
-      <form class="mt-5">
+      <form class="mt-5" (ngSubmit) = "createTa()">
         <div class="grid 2xl:grid-cols-2 grid-cols-1 md:gap-6">
             <div class="mb-5">
               <label for="courseField" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Course Name</label>
