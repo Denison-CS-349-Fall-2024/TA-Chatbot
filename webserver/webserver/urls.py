@@ -43,4 +43,5 @@ urlpatterns = [
     path('accounts/profile/', views.profile, name="profile"),
     path("getuser/", getuser, name="getuser"),
     path('api/users/', include('user_management.urls')),  # Include user management URLs
+    path('class_management/', include('class_management.urls'))
 ]
