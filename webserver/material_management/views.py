@@ -1,42 +1,102 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from .models import CourseMaterial, CourseMaterialForm
+from django.http import JsonResponse
+from .models import CourseMaterial
+from class_management.models import Course
+from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import get_object_or_404
+import os
+from django.conf import settings
 
-# Create (POST)
+@csrf_exempt
 def post_material(request):
-    if request.method == 'POST':
-        form = CourseMaterialForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            return redirect('get_materials')
-    else:
-        form = CourseMaterialForm()
-    return render(request, 'post_material.html', {'form': form})
+    if request.method == 'POST' and request.FILES.get('file'):
+        try:
+            data = request.POST
+            file = request.FILES['file']
+            file_name = data.get('fileName', file.name)
+            material_type = data.get('materialType')
+            course_id = data.get('course_id')
 
-# Read (GET)
-def get_materials(request):
-    materials = CourseMaterial.objects.all()
-    return render(request, 'get_materials.html', {'materials': materials})
+            # Get the course object
+            course = get_object_or_404(Course, id=course_id)
+            
+            # Path for saving the uploaded file
+            file_path = os.path.join(settings.MEDIA_ROOT, file_name)
+            
+            # Save the file to the 'uploads' directory
+            with open(file_path, 'wb+') as destination:
+                for chunk in file.chunks():
+                    destination.write(chunk)
+            
+            # Create a new CourseMaterial instance
+            material = CourseMaterial.objects.create_material(title=file_name, category=material_type, course=course)
+            return JsonResponse({'message': 'File uploaded and material created successfully', 'material_id': material.id, 'fileName': file_name}, status=201)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+    return JsonResponse({'error': 'File not uploaded'}, status=400)
 
-def get_material(request, title):
-    material = CourseMaterial.objects.filter(title=title)
-    return render(request, 'get_material.html', {'material': material})
+@csrf_exempt
+def delete_material(request, material_id):
+    if request.method == 'DELETE':
+        try:
+            material = get_object_or_404(CourseMaterial, id=material_id)
+            material.delete()
+            return JsonResponse({'message': 'File deleted successfully'}, status=200)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+    return JsonResponse({'error': 'Invalid HTTP method'}, status=405)
 
-# Update (PUT)
-def put_material(request, title):
-    material = get_object_or_404(CourseMaterial, title=title)
-    if request.method == 'POST':
-        form = CourseMaterialForm(request.POST, request.FILES, instance=material)
-        if form.is_valid():
-            form.save()
-            return redirect('get_materials')
-    else:
-        form = CourseMaterialForm(instance=material)
-    return render(request, 'put_material.html', {'form': form, 'material': material})
+def get_materials(request, course_id):
+    try:
+        course = get_object_or_404(Course, id=course_id)
+        materials = CourseMaterial.objects.filter(course=course)
+        materials_list = [{'id': material.id,'title': material.title, 'category': material.category, 'uploaded_date': material.uploaded_date} for material in materials]
+        
+        return JsonResponse({'materials': materials_list}, status=200)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
+    
+def get_material(request, material_id):
+    try:
+        material = get_object_or_404(CourseMaterial, id=material_id)
+        material_data = {'id': material.id, 'title': material.title, 'category': material.category, 'uploaded_date': material.uploaded_date}
+        return JsonResponse({'material': material_data}, status=200)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
 
-# Delete (DELETE)
-def delete_material(request, title):
-    material = get_object_or_404(CourseMaterial, title=title)
-    if request.method == 'POST':
-        material.delete()
-        return redirect('get_materials')
-    return render(request, 'confirm_delete.html', {'material': material})
+@csrf_exempt
+def update_material(request, material_id):
+    if request.method == 'PUT' or request.method == 'POST':
+        try:
+            material = get_object_or_404(CourseMaterial, id=material_id)
+            if request.method == 'POST':
+                data = request.POST
+                new_file = request.FILES.get('file')
+                # Update category and course_id if provided
+                material.category = data.get('materialType', material.category)
+                course_id = data.get('course_id')
+                if course_id:
+                    course = get_object_or_404(Course, id=course_id)
+                    material.course = course
+
+                # If new file is uploaded
+                if new_file:
+                    file_name = data.get('fileName', new_file.name)
+                    new_file_path = os.path.join(settings.MEDIA_ROOT, file_name)
+
+                    # Remove old file
+                    old_file_path = os.path.join(settings.MEDIA_ROOT, material.title)
+                    if os.path.exists(old_file_path):
+                        os.remove(old_file_path)
+
+                    # Save new file
+                    with open(new_file_path, 'wb+') as destination:
+                        for chunk in new_file.chunks():
+                            destination.write(chunk)
+
+                    # Update title
+                    material.title = file_name
+                material.save()
+                return JsonResponse({'message': 'Material updated successfully', 'material_id': material.id, 'fileName': material.title}, status=200)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+    return JsonResponse({'error': 'Invalid HTTP method'}, status=405)
