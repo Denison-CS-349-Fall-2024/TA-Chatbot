@@ -20,6 +20,7 @@ export class AuthService {
   }
 
   login() {
+    this.cookieService.set('userType', "instructor" );
     window.location.href = 'http://127.0.0.1:8000/accounts/login';
   }
 
