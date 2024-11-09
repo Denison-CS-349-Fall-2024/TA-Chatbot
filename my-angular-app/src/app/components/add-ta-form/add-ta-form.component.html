@@ -7,12 +7,12 @@
         <div class="grid 2xl:grid-cols-2 grid-cols-1 md:gap-6">
             <div class="mb-5">
               <label for="courseField" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Course Name</label>
-              <input type="courseField" id="courseField" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-slate-500! focus:border-slate-500! block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-slate-500 dark:focus:border-slate-500" placeholder="" autocomplete="off" required />
+              <input name = 'add-course-form-name' [(ngModel)]="this.addCourseData.name" type="courseField" id="courseField" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-slate-500! focus:border-slate-500! block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-slate-500 dark:focus:border-slate-500" placeholder="" autocomplete="off" required />
             </div>
 
             <div class="mb-5">
               <label for="sectionField" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Section</label>
-              <input type="sectionField" id="sectionField" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-slate-500 focus:border-slate-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-slate-500 dark:focus:border-slate-500" required autocomplete="off"/>
+              <input name = 'add-course-form-section' [(ngModel)]="addCourseData.section" type="sectionField" id="sectionField" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-slate-500 focus:border-slate-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-slate-500 dark:focus:border-slate-500" required autocomplete="off"/>
             </div>
         </div>
         <div class= "materials-container">

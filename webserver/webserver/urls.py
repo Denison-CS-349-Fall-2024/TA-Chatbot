@@ -68,7 +68,7 @@ urlpatterns = [
     path("getuser/", getuser, name="getuser"),
     path('api/users/', include('user_management.urls')),  # Include user management URLs
     path('api/materials/', include('material_management.urls')),  # Include user management URLs
-    path('class_management/', include('class_management.urls')),
+    path('class-management/', include('class_management.urls')),
 
     path("upload-material/", upload_file, name="upload_file")
 ]

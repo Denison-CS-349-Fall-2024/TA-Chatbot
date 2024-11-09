@@ -125,10 +125,10 @@ export class CourseService {
   // } catch (error) {
   //   console.error("Failed to add course:", error);
   // }
-  private apiUrl = 'http://127.0.0.1:8000/api';
+  private apiUrl = 'http://127.0.0.1:8000/class-management';
 
 
-  async addCourse(newCourse: { name: string; section: number; pin: number; professor: string }) {
+  async addCourse(newCourse: { name: string; section: string; pin: number; professor_id: string }) {
     try {
       console.log("seind request")
       const response = this.http.post(`${this.apiUrl}/courses/create/`, newCourse);

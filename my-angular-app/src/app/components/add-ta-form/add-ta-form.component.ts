@@ -7,15 +7,27 @@ import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-add-ta',
   standalone: true,
-  imports: [AddMaterialModalComponent, TaMaterialsComponent, FormsModule],
+  imports: [FormsModule, AddMaterialModalComponent, TaMaterialsComponent],
   templateUrl: './add-ta-form.component.html',
   styleUrl: './add-ta-form.component.css'
 })
 export class AddTaFormComponent {
 
+  protected addCourseData: {
+    name: string;
+    section: string;
+    pin: number;
+    professor_id: string;
+  }  =  {
+    name: "",
+    section: "",
+    pin: 0,
+    professor_id: "1",
+  }
   constructor(private courseService: CourseService){}
 
   async addCourse(){
-    await this.courseService.addCourse({name: "string", section: 123, pin: 1234, professor: "string",})
+    console.log(this.addCourseData);
+    await this.courseService.addCourse({name: this.addCourseData.name, section: this.addCourseData.section, pin: 1234, professor_id: this.addCourseData.professor_id,})
   }
 }
