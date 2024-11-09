@@ -2,7 +2,6 @@ from django.http import JsonResponse
 from .models import CourseMaterial
 from class_management.models import Course
 from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import get_object_or_404
 import os
 from django.conf import settings
 
@@ -17,7 +16,7 @@ def post_material(request):
             course_id = data.get('course_id')
 
             # Get the course object
-            course = get_object_or_404(Course, id=course_id)
+            course = Course.objects.get_course(course_id)
             
             # Path for saving the uploaded file
             file_path = os.path.join(settings.MEDIA_ROOT, file_name)
@@ -38,7 +37,7 @@ def post_material(request):
 def delete_material(request, material_id):
     if request.method == 'DELETE':
         try:
-            material = get_object_or_404(CourseMaterial, id=material_id)
+            material = CourseMaterial.objects.get_file(material_id)
             material.delete()
             return JsonResponse({'message': 'File deleted successfully'}, status=200)
         except Exception as e:
@@ -47,7 +46,7 @@ def delete_material(request, material_id):
 
 def get_materials(request, course_id):
     try:
-        course = get_object_or_404(Course, id=course_id)
+        course = Course.objects.get_course(course_id)
         materials = CourseMaterial.objects.filter(course=course)
         materials_list = [{'id': material.id,'title': material.title, 'category': material.category, 'uploaded_date': material.uploaded_date} for material in materials]
         
@@ -57,7 +56,7 @@ def get_materials(request, course_id):
     
 def get_material(request, material_id):
     try:
-        material = get_object_or_404(CourseMaterial, id=material_id)
+        material = CourseMaterial.objects.get_file(material_id)
         material_data = {'id': material.id, 'title': material.title, 'category': material.category, 'uploaded_date': material.uploaded_date}
         return JsonResponse({'material': material_data}, status=200)
     except Exception as e:
@@ -67,7 +66,7 @@ def get_material(request, material_id):
 def update_material(request, material_id):
     if request.method == 'PUT' or request.method == 'POST':
         try:
-            material = get_object_or_404(CourseMaterial, id=material_id)
+            material = CourseMaterial.objects.get_file(material_id)
             if request.method == 'POST':
                 data = request.POST
                 new_file = request.FILES.get('file')
@@ -75,7 +74,7 @@ def update_material(request, material_id):
                 material.category = data.get('materialType', material.category)
                 course_id = data.get('course_id')
                 if course_id:
-                    course = get_object_or_404(Course, id=course_id)
+                    course = Course.objects.get_course(course_id)
                     material.course = course
 
                 # If new file is uploaded
