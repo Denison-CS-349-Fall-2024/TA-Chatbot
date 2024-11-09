@@ -6,6 +6,8 @@ from django.shortcuts import get_object_or_404
 import os
 from django.conf import settings
 
+
+
 @csrf_exempt
 def post_material(request):
     if request.method == 'POST' and request.FILES.get('file'):
@@ -13,20 +15,24 @@ def post_material(request):
             data = request.POST
             file = request.FILES['file']
             file_name = data.get('fileName', file.name)
-            material_type = data.get('materialType')
-            course_id = data.get('course_id')
+            material_type = data.get('materialType', '')
+            # course_id = data.get('course_id')
 
             # Get the course object
-            course = get_object_or_404(Course, id=course_id)
+            # course = get_object_or_404(Course, id='3')
+            course = Course.objects.get_course('3')
+
+
             
             # Path for saving the uploaded file
             file_path = os.path.join(settings.MEDIA_ROOT, file_name)
-            
+            print(file)
             # Save the file to the 'uploads' directory
             with open(file_path, 'wb+') as destination:
                 for chunk in file.chunks():
+                    print(chunk)
                     destination.write(chunk)
-            
+            print("put it in uploads alrady")
             # Create a new CourseMaterial instance
             material = CourseMaterial.objects.create_material(title=file_name, category=material_type, course=course)
             return JsonResponse({'message': 'File uploaded and material created successfully', 'material_id': material.id, 'fileName': file_name}, status=201)
