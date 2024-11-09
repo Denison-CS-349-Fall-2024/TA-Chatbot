@@ -12,8 +12,10 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './add-ta-form.component.css'
 })
 export class AddTaFormComponent {
+
   constructor(private courseService: CourseService){}
-  createTa(){
-    this.courseService.addCourse();
+
+  async addCourse(){
+    await this.courseService.addCourse({name: "string", section: 123, pin: 1234, professor: "string",})
   }
 }

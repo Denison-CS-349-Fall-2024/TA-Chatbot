@@ -17,13 +17,10 @@ class CourseManager(models.Manager):
         
     def get_course(self, course_id):
         try:
-            course = self.get(id = course_id)
-
+            course = self.get(id=course_id)
             return course
-        
         except Course.DoesNotExist:
-            return ValueError("Invalid Course ID")
-
+            return ValueError("Invalid Material ID")
 
 
 class Course(models.Model):
@@ -34,4 +31,3 @@ class Course(models.Model):
     objects = CourseManager()
     def __str__(self):
         return self.name
-    
