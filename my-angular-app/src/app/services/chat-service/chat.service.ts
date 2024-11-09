@@ -35,7 +35,6 @@ export class ChatService {
   async addMessage(newMessage: Message) {
     //TODO: Once the backend is up, send a asynchronous call to the backend to create a new message.
     this.messagesSource.next([...this.messagesSource.getValue(), newMessage]);
-    console.log(`http://127.0.0.1:8000/api/chat/query/?question=${encodeURIComponent(newMessage.content)}`);
     this.http.get(`http://127.0.0.1:8000/api/chat/query/?question=${encodeURIComponent(newMessage.content)}`).subscribe(res =>{
 
       //@ts-ignore

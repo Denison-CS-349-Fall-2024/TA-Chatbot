@@ -1,28 +1,46 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { catchError, tap } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 import { CookieService } from 'ngx-cookie-service';
+import { Router } from '@angular/router';
+import { User } from '../../types/usertype';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  constructor(private http: HttpClient, private cookieService: CookieService) {
-    this.getUser()
+  private currentUserSubject = new BehaviorSubject<User | null>(null);
+  public currentUser: Observable<User | null> = this.currentUserSubject.asObservable();
+
+  constructor(private router: Router, private http: HttpClient, private cookieService: CookieService) {
+    //this.getUser()
+    this.checkSessionStatus().subscribe();
   }
-  
-  async getUser(){
-    this.cookieService.set('userType', "student" );
-    this.http.get<any[]>("http://127.0.0.1:8000/getuser/")
-    .pipe(
-      tap(res => console.log(res)), 
-      catchError(error => {
-        console.error('Error fetching user data:', error);
-          window.location.href = "http://127.0.0.1:8000/accounts/login";
-        return of([]); // Return an empty array or handle the error accordingly
+
+  login() {
+    window.location.href = 'http://127.0.0.1:8000/accounts/login';
+  }
+
+    checkSessionStatus(): Observable<User | null> {
+    return this.http.get<User>('http://127.0.0.1:8000/getuser', { withCredentials: true }).pipe(
+      tap((response: User) => {
+        this.currentUserSubject.next(response);
+      }),
+      catchError(() => {
+        this.login();
+        return of(null);
       })
-    ).subscribe()
+    );
   }
+
+  isAuthenticated(): boolean {
+    return this.currentUserSubject.value !== null;
+  }
+
+  isProfessor(): boolean {
+    return this.currentUserSubject.value?.isProf === true;
+  }
+
 }

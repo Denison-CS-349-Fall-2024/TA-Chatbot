@@ -20,6 +20,10 @@ env.read_env(env.str("ENV_PATH", "./.env"))
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+MEDIA_ROOT = os.path.join(BASE_DIR, 'uploads')
+MEDIA_URL = '/uploads/'
+
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
@@ -181,8 +185,7 @@ ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USER_MODEL_USERNAME_FIELD = 'email'
 
-# ACCOUNT_LOGOUT_REDIRECT_URL = 'shashank-logout-test'
-LOGIN_REDIRECT_URL = 'http://127.0.0.1:4200/'
+LOGIN_REDIRECT_URL = 'http://127.0.0.1:4200/instructor-dashboard/'
 # LOGIN_REDIRECT_URL = 'get-csrf-token/'
 
 # Allow your Angular app’s origin

@@ -1,5 +1,5 @@
-
-<p>default home page without anything, for now.</p>
-<p>go you localhost:4200/chat to see the chat page.</p>
-<p>go you localhost:4200/student-dashboard to see the student dashboard page.</p>
-<p>You can add your own page path by going to the app.routes.ts file</p>
+@if (this.currentUser?.isProf === true){
+  <app-instructor />
+}@else{
+  <app-student-dashboard />
+}
