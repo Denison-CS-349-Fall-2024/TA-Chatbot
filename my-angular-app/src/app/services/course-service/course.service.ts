@@ -1,80 +1,168 @@
+// import { Injectable } from '@angular/core';
+// import { BehaviorSubject } from 'rxjs';
+// import { Course } from '../../types/coursetypes';
+
+// @Injectable({
+//   providedIn: 'root'
+// })
+// export class CourseService {
+
+//   private dummyMaterials: string[] = ["Reading assignment 1", "Quiz 1", "Quiz 2", "Mid Term", "Homework 1"]
+//   private dummyCourses: Course[] = [
+//     {
+//       department: "CS",
+//       courseNumber: "371",
+//       section: "01",
+//       semester: "fall2024",
+//       courseTitle: "Algorithms Analysis"
+//     },
+//     {
+//       department: "CS",
+//       courseNumber: "349",
+//       section: "01",
+//       semester: "fall2024",
+//       courseTitle: "Software Engineering"
+//     },
+//     {
+//       department: "HIST",
+//       courseNumber: "150",
+//       section: "01",
+//       semester: "fall2024",
+//       courseTitle: "Medicing and Healing"
+//     }, {
+//       department: "MATH",
+//       courseNumber: "300",
+//       section: "02",
+//       semester: "fall2024",
+//       courseTitle: "Introduction to proofs"
+//     },
+//   ]
+
+//   private materialsSource = new BehaviorSubject<string[]>(this.dummyMaterials);
+//   private coursesSource = new BehaviorSubject<Course[]>(this.dummyCourses);
+
+
+//   public materials$ = this.materialsSource.asObservable();
+//   public courses$ = this.coursesSource.asObservable();
+
+//   constructor() { }
+
+  // async addCourse() { //para: course_data
+  //   // const response = await fetch('/api/courses/create/', {
+  //   //   method: 'POST',
+  //   //   headers: { 'Content-Type': 'application/json' },
+  //   //   body: JSON.stringify(course_data),
+  //   // });
+  //   // return await response.json();
+  // }
+
+//   async getCourse(email: string) {
+//     //TODO: fetch the user's courses using their email.
+
+
+//   }
+
+//   async getAllMaterial(courseId: string) {
+//     //TODO: once the backend is setup, we will want to send a request to the backend and get the all the files
+
+//     this.materialsSource.next(this.dummyMaterials);
+//   }
+//   async addMaterial(newMaterial: string) {
+//     //TODO: Once the backend is up, send a asynchronous call to the backend to create a new message.
+//     this.materialsSource.next([...this.materialsSource.getValue(), newMaterial]);
+//   }
+
+//   async deleteMaterial(index: number){
+//     //TODO: implement deleting of material.
+//     const newArray = this.materialsSource.getValue();
+
+//     if (index >= 0 && index < newArray.length){
+//       newArray.splice(index, 1);
+//       this.materialsSource.next(newArray);
+//     }
+//   }
+// }
+
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Course } from '../../types/coursetypes';
 
 @Injectable({
   providedIn: 'root'
 })
+
 export class CourseService {
 
-  private dummyMaterials: string[] = ["Reading assignment 1", "Quiz 1", "Quiz 2", "Mid Term", "Homework 1"]
-  private dummyCourses: Course[] = [
-    {
-      department: "CS",
-      courseNumber: "371",
-      section: "01",
-      semester: "fall2024",
-      courseTitle: "Algorithms Analysis"
-    },
-    {
-      department: "CS",
-      courseNumber: "349",
-      section: "01",
-      semester: "fall2024",
-      courseTitle: "Software Engineering"
-    },
-    {
-      department: "HIST",
-      courseNumber: "150",
-      section: "01",
-      semester: "fall2024",
-      courseTitle: "Medicing and Healing"
-    }, {
-      department: "MATH",
-      courseNumber: "300",
-      section: "02",
-      semester: "fall2024",
-      courseTitle: "Introduction to proofs"
-    },
-  ]
-
-  private materialsSource = new BehaviorSubject<string[]>(this.dummyMaterials);
-  private coursesSource = new BehaviorSubject<Course[]>(this.dummyCourses);
-
+  private materialsSource = new BehaviorSubject<string[]>([]);
+  private coursesSource = new BehaviorSubject<Course[]>([]);
 
   public materials$ = this.materialsSource.asObservable();
   public courses$ = this.coursesSource.asObservable();
 
-  constructor() { }
+  private apiUrl = 'http://127.0.0.1:8000/api';
 
-  async addCourse() {
-    //TODO: add a new course in the backend.
+  constructor(private http: HttpClient) { }
 
+  async addCourse(newCourse: { name: string; section: number; pin: number; professor: string }) {
+    try {
+      console.log("seind request")
+      const response = this.http.post(`${this.apiUrl}/courses/create/`, newCourse);
+      response.subscribe(res => console.log(res))
+      return response;
+    } catch (error) {
+      console.error('Error creating course:', error);
+      return 
+    }
   }
 
-  async getCourse(email: string) {
-    //TODO: fetch the user's courses using their email.
-
-
+  async getCourses(email: string) {
+    this.http.get<Course[]>(`${this.apiUrl}/courses/professor/${email}/`).subscribe({
+      next: (courses) => this.coursesSource.next(courses), // courses is now an array here
+      error: (error) => console.error('Error fetching courses:', error),
+    });
   }
 
-  async getAllMaterial(courseId: string) {
-    //TODO: once the backend is setup, we will want to send a request to the backend and get the all the files
-
-    this.materialsSource.next(this.dummyMaterials);
+  async getMaterials(course_id: number) {
+    this.http.get<string[]>(`${this.apiUrl}/materials/all/${course_id}/`).subscribe({
+      next: (materials) => this.materialsSource.next(materials),
+      error: (error) => console.error('Error fetching materials:', error),
+    });
   }
+
+  // async addMaterial(newMaterial: {title: string; category: string; course_id: number}) {
+  //   try {
+  //     const response = this.http.post(`${this.apiUrl}/materials/upload/`, newMaterial);
+  //     // Refresh the materials list after adding a new material
+  //     if (response) {
+  //       this.getMaterials(newMaterial.course_id);
+  //     }
+  //   } catch (error) {
+  //     console.error('Error adding material:', error);
+  //   }
+  // }
+
   async addMaterial(newMaterial: string) {
     //TODO: Once the backend is up, send a asynchronous call to the backend to create a new message.
     this.materialsSource.next([...this.materialsSource.getValue(), newMaterial]);
   }
 
-  async deleteMaterial(index: number){
-    //TODO: implement deleting of material.
-    const newArray = this.materialsSource.getValue();
+  async deleteMaterial(material_id: number) {
+    try {
+      this.http.delete(`${this.apiUrl}/materials/delete/${material_id}/`);
+    } catch (error) {
+      console.error('Error deleting material:', error);
+    }
+  }
 
-    if (index >= 0 && index < newArray.length){
-      newArray.splice(index, 1);
-      this.materialsSource.next(newArray);
+  async updateMaterial(material_id: number, updatedMaterial: FormData, course_id: number) {
+    try {
+      const headers = new HttpHeaders().append('enctype', 'multipart/form-data');
+      this.http.put(`${this.apiUrl}/materials/update/${material_id}/`, updatedMaterial, { headers });
+      // Refresh the materials list after updating
+      this.getMaterials(course_id);
+    } catch (error) {
+      console.error('Error updating material:', error);
     }
   }
 }

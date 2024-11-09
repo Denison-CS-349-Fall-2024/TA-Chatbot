@@ -13,6 +13,13 @@ class CourseMaterialManager(models.Manager):
             return True
         except CourseMaterial.DoesNotExist:
             return False
+        
+    def get_file(self, material_id):
+        try:
+            material = self.get(id=material_id)
+            return material
+        except CourseMaterial.DoesNotExist:
+            return ValueError("Invalid Material ID")
 
 class CourseMaterial(models.Model):
     title = models.CharField(max_length=255) 
