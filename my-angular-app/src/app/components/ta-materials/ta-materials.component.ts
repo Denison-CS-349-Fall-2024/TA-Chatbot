@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { AddMaterialModalComponent } from "../add-material-modal/add-material-modal.component";
 import { Subscription } from 'rxjs';
 import { CourseService } from '../../services/course-service/course.service';
@@ -15,6 +15,8 @@ export class TaMaterialsComponent {
   protected materialSubscription!: Subscription;
   protected materials!: string[];
   protected fileSelectedToDelete: number | null = null;
+  @Input() semester: string | null = null;
+  @Input() courseAndSection: string | null = null;
 
   constructor(private courseService: CourseService) {
 

@@ -32,9 +32,18 @@ export class ChatService {
     //partiular user for a particular class chat. For now, let's just return the dummyMessageData array.
     this.messagesSource.next(this.dummyMessagesData);
   }
-  async addMessage(newMessage: Message) {
+  async addMessage(newMessage: Message, semester: string, courseAndSection: string) {
     //TODO: Once the backend is up, send a asynchronous call to the backend to create a new message.
     this.messagesSource.next([...this.messagesSource.getValue(), newMessage]);
+
+    this.http.get(`http://127.0.0.1:8000/api/chat/query/?question=${encodeURIComponent(newMessage.content)}`).subscribe(res =>{
+
+      //@ts-ignore
+      this.messagesSource.next([...this.messagesSource.getValue(), {content: res.response, isSentByUser: false}]);
+    }
+    )
+
+    console.log(semester, courseAndSection);
     this.http.get(`http://127.0.0.1:8000/api/chat/query/?question=${encodeURIComponent(newMessage.content)}`).subscribe(res =>{
 
       //@ts-ignore

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CourseService } from '../../services/course-service/course.service';
 import { HttpClient } from '@angular/common/http';
@@ -91,6 +91,9 @@ export class AddMaterialModalComponent {
   protected selectedFileType: string = "";
   protected materialName: string = "";
 
+  @Input() semester!: string | null;
+  @Input() courseAndSection!: string | null;
+
   constructor(private courseService: CourseService, private http: HttpClient) {}
 
   onFileSelect(event: Event) {
@@ -104,19 +107,20 @@ export class AddMaterialModalComponent {
     if (this.selectedFile) {
 
       this.courseService.uploadFile(this.selectedFile, this.selectedFileType);
-
+      console.log("time", this.courseAndSection);
       const formData = new FormData();
       formData.append('file', this.selectedFile, this.selectedFile.name);
       formData.append('materialName', this.materialName)
       formData.append('materialType', this.selectedFileType)
+      formData.append("semester", this.semester!);
+      formData.append("class_id", this.courseAndSection!);
+
       await this.addMaterial(this.materialName);
       formData.forEach((value, key) => {
-      console.log(key, value);
+
     });
 
       this.http.post('http://127.0.0.1:8000/api/materials/upload/', formData).subscribe(response => {
-    
-    
         console.log('File uploaded successfully', response);
       }, error => {
         console.error('File upload failed', error);

@@ -44,4 +44,12 @@ export class AuthService {
     return this.currentUserSubject.value?.isProf === true;
   }
 
+  getEmail() {
+    return this.currentUserSubject.value?.email;
+  }
+
+  getId() {
+    return this.currentUserSubject.value?.id;
+  }
+
 }

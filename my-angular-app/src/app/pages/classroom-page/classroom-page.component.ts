@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { TaMaterialsComponent } from "../../components/ta-materials/ta-materials.component";
 import { ActivatedRoute } from '@angular/router';
 

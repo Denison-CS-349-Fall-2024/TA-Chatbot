@@ -12,6 +12,7 @@ from langchain.text_splitter import CharacterTextSplitter
 from sentence_transformers import SentenceTransformer
 import PyPDF2
 from openai import OpenAI
+import re
 
 # Load environment variables from .env file
 load_dotenv()
@@ -81,6 +82,19 @@ def upload_embeddings(index, chunks, embeddings, class_id, material_name):
     index.upsert(vectors)
     print("inserted succesfully")
 
+def parse_course_string(course_str):
+
+    pattern = r"([A-Za-z]+)(\d{3})-(\d{2})"
+    
+    match = re.match(pattern, course_str)
+    
+    if match:
+        department = match.group(1)
+        course_number = match.group(2)
+        class_number = match.group(3)
+        return department, course_number, class_number
+    else:
+        raise ValueError("Invalid course format")
 
 @csrf_exempt
 def post_material(request):
@@ -91,17 +105,15 @@ def post_material(request):
             file_name = data.get('fileName', file.name)
             material_type = data.get('materialType', file.name)
             material_name = data.get('materialName', '')
-            print('material name', material_name)
-            print("material_type", material_type)
-            # course_id = data.get('course_id')
-
-            course_identififer = "CS371-01"
-
-            # Get the course object
-            # course = get_object_or_404(Course, id='3')
-            course = Course.objects.get_course('3')
+            course_identififer = data.get("class_id", "")
+            parsed_string = parse_course_string(course_identififer)
+            
 
 
+            print(parsed_string[0], parsed_string[1], parsed_string[2])
+            course = Course.objects.get_course_by_course_identifier(parsed_string[0], parsed_string[1], parsed_string[2])
+
+            print("the course", course)
             
             # Path for saving the uploaded file
             file_path = os.path.join(settings.MEDIA_ROOT, file_name)
@@ -123,7 +135,7 @@ def post_material(request):
 
             upload_embeddings(index,chunks,embeddings,class_id=course_identififer,material_name=material_name)
             # Create a new CourseMaterial instance
-            material = CourseMaterial.objects.create_material(title=file_name, category=material_type, course=course)
+            material = CourseMaterial.objects.create_material(title=material_name, category=material_type, course=course)
             return JsonResponse({'message': 'File uploaded and material created successfully', 'material_id': material.id, 'fileName': file_name}, status=201)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)

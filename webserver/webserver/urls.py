@@ -30,6 +30,7 @@ def getuser(request):
     user = request.user
     if user.is_authenticated:
         response_data = {
+            "id": user.id,
             "email": user.email,
             "isProf": user.is_prof,
             "name": user.name

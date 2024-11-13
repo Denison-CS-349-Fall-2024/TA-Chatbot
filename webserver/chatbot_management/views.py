@@ -3,9 +3,12 @@ from dotenv import load_dotenv
 from pinecone import Pinecone, ServerlessSpec
 from langchain.text_splitter import CharacterTextSplitter
 from sentence_transformers import SentenceTransformer
+from django.views.decorators.csrf import csrf_exempt
 import PyPDF2
 from openai import OpenAI
 from django.http import JsonResponse
+import json
+
 
 # Load environment variables from .env file
 load_dotenv()
@@ -20,15 +23,16 @@ PINECONE_ENVIRONMENT = "us-east-1"
 pc = Pinecone(api_key=PINECONE_API_KEY)
 
 # Define the index name
-index_name = "course_embeddings"  # Your Pinecone index name
+index_name = "course-embeddings"  # Your Pinecone index name
 
 # Function to perform similarity search using Pinecone
-def search_embeddings(index, query_embedding, class_id, material_type, top_k=3):
+def search_embeddings(index, query_embedding, class_id, top_k=3):
     # Construct metadata filters for class_id and material_type
     query_filter = {
         'class_id': class_id,
-        'file_type': material_type
+        # 'file_type': material_type
     }
+    print('check 3.1')
     
     # Perform the similarity search with metadata filters
     results = index.query(
@@ -37,34 +41,41 @@ def search_embeddings(index, query_embedding, class_id, material_type, top_k=3):
         include_metadata=True,
         filter=query_filter  # Filter by class_id and material_type
     )
+    print('check 3.2')
     return results
 
 # Function to process the query and get the response
-def process_query_and_generate_response(query, class_id, material_type, top_k=3):
+def process_query_and_generate_response(query, class_id, top_k=3):
+    print('check 1')
     # Create the query embedding using SentenceTransformer
     model = SentenceTransformer('all-MiniLM-L6-v2')
     query_embedding = model.encode(query, convert_to_tensor=True)
+    print('check 2')
 
     # Initialize Pinecone index and perform similarity search
     index = pc.Index(index_name)
-    search_results = search_embeddings(index, query_embedding, class_id, material_type, top_k)
+    search_results = search_embeddings(index, query_embedding, class_id, top_k)
+    print('check 3')
 
     # Gather the most relevant results
     results_text = ""
     for match in search_results['matches']:
         results_text += match['metadata']['text'] + '\n'
 
+    print('check 4')
+
     # Generate a response using GPT-4
     completion = client.chat.completions.create(
         model="gpt-4",  # Ensure you're using the correct model name
         messages=[
-            {"role": "system", "content": "You are a helpful assistant for CS 349 - Software Engineering, answering class-related questions."},
+            {"role": "system", "content": "You are a helpful assistant, answering class-related questions."},
             {
                 "role": "user",
                 "content": f"""
                 A student asked the following question:
 
                 Question: {query}
+
                 ---
                 Only use the provided text to answer the question. The responses are ordered by decreasing cosine similarity with the query. Analyze the responses and construct an answer that best addresses the question.
                 ---
@@ -74,22 +85,32 @@ def process_query_and_generate_response(query, class_id, material_type, top_k=3)
         ],
         temperature=0.6
     )
-
+    print("check 5", completion)
     # Extract the response from GPT-4
     response_content = completion.choices[0].message.content
     return response_content  # Return the raw content for further processing
 
 # View to handle the query request
+@csrf_exempt
 def process_query(request):
-    question = request.GET.get('question')  # Get the question from query parameters
-    class_id = request.GET.get('class_id')  # Example: Use the class ID from query parameters. if class_id not provided  ,'CS371-01' default 
-    material_type = request.GET.get('material_type')  # Example: Use the material type from query parameters
+    data = json.loads(request.body)
+
+    class_id = data.get("class_id")
+    question = data.get("query")
+    print(question, class_id)
+    response_content = process_query_and_generate_response(question, class_id)
+    return JsonResponse({'response': response_content})
+
+    # if request.method == "POST"
+    # question = request.GET.get('question')  # Get the question from query parameters
+    # class_id = request.GET.get('class_id')  # Example: Use the class ID from query parameters. if class_id not provided  ,'CS371-01' default 
+    # material_type = request.GET.get('material_type')  # Example: Use the material type from query parameters
 
     # Get the response for the query
-    response_content = process_query_and_generate_response(question, class_id, material_type)
+    # response_content = process_query_and_generate_response(question, class_id, material_type)
     
     # Return the response as JSON
-    return JsonResponse({'response': response_content})
+    # return JsonResponse({'response': response_content})
 
 
 

@@ -87,6 +87,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Course } from '../../types/coursetypes';
+import { AuthService } from '../auth-service/auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -100,7 +101,15 @@ export class CourseService {
   public materials$ = this.materialsSource.asObservable();
   public courses$ = this.coursesSource.asObservable();
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private authService: AuthService) {
+    this.authService.currentUser.subscribe(user => {
+      if (this.authService.isProfessor()) {
+        this.getCourses(this.authService.getId()!);
+      } else {
+        console.log('User is not a professor');
+      }
+    });
+   }
 
   // async addCourse() {
 
@@ -128,21 +137,28 @@ export class CourseService {
   private apiUrl = 'http://127.0.0.1:8000/class-management';
 
 
-  async addCourse(newCourse: { name: string; section: string; pin: number; professor_id: string }) {
+  async addCourse(name: string, section: string, department: string, course_number: string){
     try {
-      console.log("seind request")
-      const response = this.http.post(`${this.apiUrl}/courses/create/`, newCourse);
-      response.subscribe(res => console.log(res))
-      return response;
+      let professor_id = '0'
+      this.authService.currentUser.subscribe((user) => {
+        if (user){
+          professor_id = user?.id
+        }
+        })
+      this.http.post<any>("http://127.0.0.1:8000/class-management/courses/create/", {name, section, department, course_number, professor_id}).subscribe({
+        next: (response) => console.log(response),
+        error: (error) => console.error("error in adding a course", error)
+      })
     } catch (error) {
       console.error('Error creating course:', error);
       return 
     }
   }
 
-  async getCourses(email: string) {
-    this.http.get<Course[]>(`${this.apiUrl}/courses/professor/${email}/`).subscribe({
-      next: (courses) => this.coursesSource.next(courses), // courses is now an array here
+  async getCourses(id: string) {
+    this.http.get<{courses: Course[]}>(`${this.apiUrl}/courses/professor/${id}/`).subscribe({
+      next: (response: {courses: Course[]}) => {
+        this.coursesSource.next(response.courses)}, 
       error: (error) => console.error('Error fetching courses:', error),
     });
   }

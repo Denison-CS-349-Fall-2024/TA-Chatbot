@@ -4,6 +4,20 @@ from django.shortcuts import get_object_or_404
 from .models import Course
 from user_management.models import User
 import json
+import random
+import string
+from datetime import datetime
+
+def generate_random_string(length=6):
+    # Define the possible characters (uppercase, lowercase, and digits)
+    characters = string.ascii_letters + string.digits
+
+    random_string = ''.join(random.choice(characters) for _ in range(length))
+    return random_string
+
+def get_current_semester():
+    return f"{'spring' if datetime.now().month < 6 else 'fall'}{datetime.now().year}"
+
 
 @csrf_exempt
 def create_course(request):
@@ -11,12 +25,16 @@ def create_course(request):
         try:
             data = json.loads(request.body)  
             name = data.get('name')
-            pin = data.get('pin')
+            pin = generate_random_string()
             section = data.get('section')
             professor = data.get('professor_id')
+            department = data.get('department')
+            course_number = data.get('course_number')
+            semester = get_current_semester()
+            
             print(data)
 
-            course = Course.objects.create_course(name=name, pin=pin, section=section, professor=professor)
+            course = Course.objects.create_course(name=name, pin=pin, section=section, professor=professor, department=department, course_number = course_number, semester = semester)
             return JsonResponse({'message': 'Course created successfully', 'course_id': course.id}, status=201)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
@@ -38,8 +56,10 @@ def delete_course(request, course_id):
 def courses_by_professor(request, professor_id):
     try:
         professor = get_object_or_404(User, id=professor_id)
-        courses = Course.objects.filter(professor=professor)
-        courses_list = [{'id': course.id,'name': course.name, 'section':course.section, 'pin': course.pin} for course in courses]
+        courses = Course.objects.filter(professor=professor_id)
+        print('professor', professor)
+        print('course', courses)
+        courses_list = [{'id': course.id,'name': course.name, 'section':course.section, 'pin': course.pin, 'department': course.department, 'semester': course.semester, 'courseTitle': course.name, 'courseNumber': course.course_number} for course in courses]
         
         return JsonResponse({'courses': courses_list}, status=200)
     except Exception as e:
