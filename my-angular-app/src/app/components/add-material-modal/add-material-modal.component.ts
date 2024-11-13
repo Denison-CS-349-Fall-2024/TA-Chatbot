@@ -107,6 +107,8 @@ export class AddMaterialModalComponent {
 
       const formData = new FormData();
       formData.append('file', this.selectedFile, this.selectedFile.name);
+      formData.append('materialName', this.materialName)
+      formData.append('materialType', this.selectedFileType)
       await this.addMaterial(this.materialName);
       formData.forEach((value, key) => {
       console.log(key, value);
