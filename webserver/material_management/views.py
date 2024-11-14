@@ -64,6 +64,14 @@ def initialize_index(index_name, dimension, metric="cosine"):
     index = pc.Index(index_name)
     return index
 
+def delete_embeddings(index,class_id,material_name):
+    filter_criteria = {
+        "course_identififer": class_id,
+        "material_name": material_name
+    }
+    
+    # Perform the deletion with the filter criteria
+    index.delete(filter=filter_criteria)
 
 def upload_embeddings(index, chunks, embeddings, class_id, material_name):
     vectors = [
@@ -145,6 +153,14 @@ def post_material(request):
 def delete_material(request, material_id):
     if request.method == 'DELETE':
         try:
+            data = request.POST
+            course_identifier = data.POST("class_id","")
+            material_name = data.get('materialName', '')
+
+            index = initialize_index(index_name)
+
+
+            delete_embeddings(index,class_id=course_identifier,material_name=material_name)
             material = get_object_or_404(CourseMaterial, id=material_id)
             material.delete()
             return JsonResponse({'message': 'File deleted successfully'}, status=200)
