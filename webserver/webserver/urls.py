@@ -24,52 +24,14 @@ from django.shortcuts import redirect
 import os
 from django.conf import settings
 
-def getuser(request):
-    # redirect_url = f"http://localhost:4200?session_token={ request.session.session_key }"
-    # return redirect(redirect_url)
-    user = request.user
-    if user.is_authenticated:
-        response_data = {
-            "id": user.id,
-            "email": user.email,
-            "isProf": user.is_prof,
-            "name": user.name
-        }
-        return JsonResponse(response_data)
-    
-    return JsonResponse({"error": "User not authenticated"}, status=401)  # Handle the case where user is not authenticated
-
-@csrf_exempt
-def upload_file(request):
-
-    if request.method == 'POST' and request.FILES.get('file'):
-        file = request.FILES['file']
-        file_name = request.POST.get('fileName', file.name)  # Fallback to original name if not provided
-        material_type = request.POST.get('materialType') 
-
-        file_path = os.path.join(settings.MEDIA_ROOT, file_name)
-
-        # Save the file to the 'uploads' directory
-        with open(file_path, 'wb+') as destination:
-            for chunk in file.chunks():
-                destination.write(chunk)
-        
-
-        return JsonResponse({'message': 'File uploaded successfully', 'fileName': file_name})
-
-    return JsonResponse({'error': 'File not uploaded'}, status=400)
-
-
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/chat/',include("chatbot_management.urls")),
     path('accounts/', include('allauth.urls')),
-    path('accounts/profile/', views.profile, name="profile"),
-    path("getuser/", getuser, name="getuser"),
-    path('api/users/', include('user_management.urls')),  # Include user management URLs
-    path('api/materials/', include('material_management.urls')),  # Include user management URLs
-    path('class-management/', include('class_management.urls')),
+    # path('accounts/profile/', views.profile, name="profile"), #for authentication debug purposes
 
-    path("upload-material/", upload_file, name="upload_file")
+    path('api/chat/',include("chatbot_management.urls")),
+    path('api/users/', include('user_management.urls')), 
+    path('api/materials/', include('material_management.urls')),
+    path('class-management/', include('class_management.urls')),
 ]

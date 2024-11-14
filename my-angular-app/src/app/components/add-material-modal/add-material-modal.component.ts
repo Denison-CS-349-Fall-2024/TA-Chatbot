@@ -107,7 +107,6 @@ export class AddMaterialModalComponent {
     if (this.selectedFile) {
 
       this.courseService.uploadFile(this.selectedFile, this.selectedFileType);
-      console.log("time", this.courseAndSection);
       const formData = new FormData();
       formData.append('file', this.selectedFile, this.selectedFile.name);
       formData.append('materialName', this.materialName)

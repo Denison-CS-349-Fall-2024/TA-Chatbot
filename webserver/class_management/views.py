@@ -31,8 +31,7 @@ def create_course(request):
             department = data.get('department')
             course_number = data.get('course_number')
             semester = get_current_semester()
-            
-            print(data)
+
 
             course = Course.objects.create_course(name=name, pin=pin, section=section, professor=professor, department=department, course_number = course_number, semester = semester)
             return JsonResponse({'message': 'Course created successfully', 'course_id': course.id}, status=201)
@@ -57,8 +56,6 @@ def courses_by_professor(request, professor_id):
     try:
         professor = get_object_or_404(User, id=professor_id)
         courses = Course.objects.filter(professor=professor_id)
-        print('professor', professor)
-        print('course', courses)
         courses_list = [{'id': course.id,'name': course.name, 'section':course.section, 'pin': course.pin, 'department': course.department, 'semester': course.semester, 'courseTitle': course.name, 'courseNumber': course.course_number} for course in courses]
         
         return JsonResponse({'courses': courses_list}, status=200)

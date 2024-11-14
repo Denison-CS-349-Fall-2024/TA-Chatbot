@@ -25,7 +25,8 @@ export class AuthService {
   }
 
     checkSessionStatus(): Observable<User | null> {
-    return this.http.get<User>('http://127.0.0.1:8000/getuser', { withCredentials: true }).pipe(
+
+    return this.http.get<User>('http://127.0.0.1:8000/api/users/is-authenticated/', { withCredentials: true }).pipe(
       tap((response: User) => {
         this.currentUserSubject.next(response);
       }),

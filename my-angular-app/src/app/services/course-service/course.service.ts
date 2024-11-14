@@ -105,20 +105,15 @@ export class CourseService {
     this.authService.currentUser.subscribe(user => {
       if (this.authService.isProfessor()) {
         this.getCourses(this.authService.getId()!);
-      } else {
-        console.log('User is not a professor');
       }
     });
 
    }
 
    fetchMaterials(semester: string, courseAndSection: string){
-    this.http.get<any[]>(`http://127.0.0.1:8000/api/materials/get-materials-by-class-id/${courseAndSection}/`).subscribe({
+    this.http.get<{materials: Material[]}>(`http://127.0.0.1:8000/api/materials/get-materials-by-class-id/${courseAndSection}/`).subscribe({
       next: (materials) => {
-        //@ts-ignore
         this.materialsSource.next(materials.materials)
-        //@ts-ignore
-        console.log(materials.materials);
       },
       error: (error) => console.error('Error fetching materials:', error),
     });
