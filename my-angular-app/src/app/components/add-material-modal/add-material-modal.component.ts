@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CourseService } from '../../services/course-service/course.service';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-add-material-modal',
@@ -90,7 +91,10 @@ export class AddMaterialModalComponent {
   protected selectedFileType: string = "";
   protected materialName: string = "";
 
-  constructor(private courseService: CourseService) {}
+  @Input() semester!: string | null;
+  @Input() courseAndSection!: string | null;
+
+  constructor(private courseService: CourseService, private http: HttpClient) {}
 
   onFileSelect(event: Event) {
     const input = event.target as HTMLInputElement;
@@ -103,26 +107,29 @@ export class AddMaterialModalComponent {
     if (this.selectedFile) {
 
       this.courseService.uploadFile(this.selectedFile, this.selectedFileType);
+      const formData = new FormData();
+      formData.append('file', this.selectedFile, this.selectedFile.name);
+      formData.append('materialName', this.materialName)
+      formData.append('materialType', this.selectedFileType)
+      formData.append("semester", this.semester!);
+      formData.append("class_id", this.courseAndSection!);
 
-    //   const formData = new FormData();
-    //   formData.append('file', this.selectedFile, this.selectedFile.name);
-    //   await this.addMaterial(this.materialName);
-    //   formData.forEach((value, key) => {
-    //   console.log(key, value);
-    // });
-      // this.http.post('https://your-backend-api.com/upload', formData).subscribe(response => {
-    //
-    //
-      //   console.log('File uploaded successfully', response);
-      // }, error => {
-      //   console.error('File upload failed', error);
-      // });
+      await this.addMaterial(this.materialName);
+      formData.forEach((value, key) => {
+
+    });
+
+      this.http.post('http://127.0.0.1:8000/api/materials/upload/', formData).subscribe(response => {
+        console.log('File uploaded successfully', response);
+      }, error => {
+        console.error('File upload failed', error);
+      });
     } else {
       console.error('No file selected!');
     }
   }
 
   async addMaterial(fileName: string){
-    await this.courseService.addMaterial(fileName);
+    // await this.courseService.addMaterial(fileName);
   }
 }

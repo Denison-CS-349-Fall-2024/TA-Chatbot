@@ -67,10 +67,10 @@
 
 //     this.materialsSource.next(this.dummyMaterials);
 //   }
-//   async addMaterial(newMaterial: string) {
-//     //TODO: Once the backend is up, send a asynchronous call to the backend to create a new message.
-//     this.materialsSource.next([...this.materialsSource.getValue(), newMaterial]);
-//   }
+  // async addMaterial(newMaterial: ) {
+  //   //TODO: Once the backend is up, send a asynchronous call to the backend to create a new message.
+  //   this.materialsSource.next([...this.materialsSource.getValue(), newMaterial]);
+  // }
 
 //   async deleteMaterial(index: number){
 //     //TODO: implement deleting of material.
@@ -86,7 +86,8 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Course } from '../../types/coursetypes';
+import { Course, Material } from '../../types/coursetypes';
+import { AuthService } from '../auth-service/auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -94,14 +95,29 @@ import { Course } from '../../types/coursetypes';
 
 export class CourseService {
 
-  private materialsSource = new BehaviorSubject<string[]>([]);
+  private materialsSource = new BehaviorSubject<Material[]>([]);
   private coursesSource = new BehaviorSubject<Course[]>([]);
 
   public materials$ = this.materialsSource.asObservable();
   public courses$ = this.coursesSource.asObservable();
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private authService: AuthService) {
+    this.authService.currentUser.subscribe(user => {
+      if (this.authService.isProfessor()) {
+        this.getCourses(this.authService.getId()!);
+      }
+    });
 
+   }
+
+   fetchMaterials(semester: string, courseAndSection: string){
+    this.http.get<{materials: Material[]}>(`http://127.0.0.1:8000/api/materials/get-materials-by-class-id/${courseAndSection}/`).subscribe({
+      next: (materials) => {
+        this.materialsSource.next(materials.materials)
+      },
+      error: (error) => console.error('Error fetching materials:', error),
+    });
+   }
   // async addCourse() {
 
   // try {
@@ -128,31 +144,38 @@ export class CourseService {
   private apiUrl = 'http://127.0.0.1:8000/class-management';
 
 
-  async addCourse(newCourse: { name: string; section: string; pin: number; professor_id: string }) {
+  async addCourse(name: string, section: string, department: string, course_number: string){
     try {
-      console.log("seind request")
-      const response = this.http.post(`${this.apiUrl}/courses/create/`, newCourse);
-      response.subscribe(res => console.log(res))
-      return response;
+      let professor_id = '0'
+      this.authService.currentUser.subscribe((user) => {
+        if (user){
+          professor_id = user?.id
+        }
+        })
+      this.http.post<any>("http://127.0.0.1:8000/class-management/courses/create/", {name, section, department, course_number, professor_id}).subscribe({
+        next: (response) => console.log(response),
+        error: (error) => console.error("error in adding a course", error)
+      })
     } catch (error) {
       console.error('Error creating course:', error);
       return 
     }
   }
 
-  async getCourses(email: string) {
-    this.http.get<Course[]>(`${this.apiUrl}/courses/professor/${email}/`).subscribe({
-      next: (courses) => this.coursesSource.next(courses), // courses is now an array here
+  async getCourses(id: string) {
+    this.http.get<{courses: Course[]}>(`${this.apiUrl}/courses/professor/${id}/`).subscribe({
+      next: (response: {courses: Course[]}) => {
+        this.coursesSource.next(response.courses)}, 
       error: (error) => console.error('Error fetching courses:', error),
     });
   }
 
-  async getMaterials(course_id: number) {
-    this.http.get<string[]>(`${this.apiUrl}/materials/all/${course_id}/`).subscribe({
-      next: (materials) => this.materialsSource.next(materials),
-      error: (error) => console.error('Error fetching materials:', error),
-    });
-  }
+  // async getMaterials(course_id: number) {
+  //   this.http.get<string[]>(`${this.apiUrl}/materials/all/${course_id}/`).subscribe({
+  //     next: (materials) => this.materialsSource.next(materials),
+  //     error: (error) => console.error('Error fetching materials:', error),
+  //   });
+  // }
 
   // async addMaterial(newMaterial: {title: string; category: string; course_id: number}) {
   //   try {
@@ -166,11 +189,11 @@ export class CourseService {
   //   }
   // }
 
-  async addMaterial(newMaterial: string) {
-    //TODO: Once the backend is up, send a asynchronous call to the backend to create a new message.
+  // async addMaterial(newMaterial: string) {
+  //   //TODO: Once the backend is up, send a asynchronous call to the backend to create a new message.
 
-    this.materialsSource.next([...this.materialsSource.getValue(), newMaterial]);
-  }
+  //   this.materialsSource.next([...this.materialsSource.getValue(), newMaterial]);
+  // }
 
   async deleteMaterial(material_id: number) {
     try {
@@ -206,14 +229,14 @@ export class CourseService {
   }
 
 
-  async updateMaterial(material_id: number, updatedMaterial: FormData, course_id: number) {
-    try {
-      const headers = new HttpHeaders().append('enctype', 'multipart/form-data');
-      this.http.put(`${this.apiUrl}/materials/update/${material_id}/`, updatedMaterial, { headers });
-      // Refresh the materials list after updating
-      this.getMaterials(course_id);
-    } catch (error) {
-      console.error('Error updating material:', error);
-    }
-  }
+  // async updateMaterial(material_id: number, updatedMaterial: FormData, course_id: number) {
+  //   try {
+  //     const headers = new HttpHeaders().append('enctype', 'multipart/form-data');
+  //     this.http.put(`${this.apiUrl}/materials/update/${material_id}/`, updatedMaterial, { headers });
+  //     // Refresh the materials list after updating
+  //     this.getMaterials(course_id);
+  //   } catch (error) {
+  //     console.error('Error updating material:', error);
+  //   }
+  // }
 }

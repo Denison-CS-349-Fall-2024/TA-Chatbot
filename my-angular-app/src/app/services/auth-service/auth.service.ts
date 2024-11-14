@@ -20,11 +20,13 @@ export class AuthService {
   }
 
   login() {
+    this.cookieService.set('userType', "instructor" );
     window.location.href = 'http://127.0.0.1:8000/accounts/login';
   }
 
     checkSessionStatus(): Observable<User | null> {
-    return this.http.get<User>('http://127.0.0.1:8000/getuser', { withCredentials: true }).pipe(
+
+    return this.http.get<User>('http://127.0.0.1:8000/api/users/is-authenticated/', { withCredentials: true }).pipe(
       tap((response: User) => {
         this.currentUserSubject.next(response);
       }),
@@ -41,6 +43,14 @@ export class AuthService {
 
   isProfessor(): boolean {
     return this.currentUserSubject.value?.isProf === true;
+  }
+
+  getEmail() {
+    return this.currentUserSubject.value?.email;
+  }
+
+  getId() {
+    return this.currentUserSubject.value?.id;
   }
 
 }
