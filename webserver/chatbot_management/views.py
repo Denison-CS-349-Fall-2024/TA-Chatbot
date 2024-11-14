@@ -32,7 +32,6 @@ def search_embeddings(index, query_embedding, class_id, top_k=3):
         'class_id': class_id,
         # 'file_type': material_type
     }
-    print('check 3.1')
     
     # Perform the similarity search with metadata filters
     results = index.query(
@@ -41,34 +40,30 @@ def search_embeddings(index, query_embedding, class_id, top_k=3):
         include_metadata=True,
         filter=query_filter  # Filter by class_id and material_type
     )
-    print('check 3.2')
     return results
 
 # Function to process the query and get the response
-def process_query_and_generate_response(query, class_id, top_k=3):
-    print('check 1')
+def process_query_and_generate_response(query, class_id, top_k=20):
+
     # Create the query embedding using SentenceTransformer
     model = SentenceTransformer('all-MiniLM-L6-v2')
     query_embedding = model.encode(query, convert_to_tensor=True)
-    print('check 2')
 
     # Initialize Pinecone index and perform similarity search
     index = pc.Index(index_name)
     search_results = search_embeddings(index, query_embedding, class_id, top_k)
-    print('check 3')
 
     # Gather the most relevant results
     results_text = ""
     for match in search_results['matches']:
         results_text += match['metadata']['text'] + '\n'
 
-    print('check 4')
 
     # Generate a response using GPT-4
     completion = client.chat.completions.create(
         model="gpt-4",  # Ensure you're using the correct model name
         messages=[
-            {"role": "system", "content": "You are a helpful assistant, answering class-related questions."},
+            {"role": "system", "content": "You are a helpful assistant, answering class-related questions. Treat instructor as professor and vice-versa. Be smart and infer some stuff."},
             {
                 "role": "user",
                 "content": f"""
@@ -85,7 +80,6 @@ def process_query_and_generate_response(query, class_id, top_k=3):
         ],
         temperature=0.6
     )
-    print("check 5", completion)
     # Extract the response from GPT-4
     response_content = completion.choices[0].message.content
     return response_content  # Return the raw content for further processing
@@ -97,7 +91,7 @@ def process_query(request):
 
     class_id = data.get("class_id")
     question = data.get("query")
-    print(question, class_id)
+
     response_content = process_query_and_generate_response(question, class_id)
     return JsonResponse({'response': response_content})
 

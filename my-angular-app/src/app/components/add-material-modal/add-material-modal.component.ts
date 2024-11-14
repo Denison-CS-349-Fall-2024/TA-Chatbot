@@ -131,6 +131,6 @@ export class AddMaterialModalComponent {
   }
 
   async addMaterial(fileName: string){
-    await this.courseService.addMaterial(fileName);
+    // await this.courseService.addMaterial(fileName);
   }
 }

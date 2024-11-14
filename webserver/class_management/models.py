@@ -35,7 +35,7 @@ class Course(models.Model):
     section = models.CharField(max_length=255, default='01')
     department = models.CharField(max_length=255, default="NA")
     semester = models.CharField(max_length=255, default="fall2024") #default value needs to be udated
-    course_number = models.IntegerField(max_length=255, default=0)
+    course_number = models.IntegerField(default=0)
     pin = models.CharField(max_length=255)
     professor = models.CharField(max_length=255)
     objects = CourseManager()

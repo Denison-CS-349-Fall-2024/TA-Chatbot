@@ -67,10 +67,10 @@
 
 //     this.materialsSource.next(this.dummyMaterials);
 //   }
-//   async addMaterial(newMaterial: string) {
-//     //TODO: Once the backend is up, send a asynchronous call to the backend to create a new message.
-//     this.materialsSource.next([...this.materialsSource.getValue(), newMaterial]);
-//   }
+  // async addMaterial(newMaterial: ) {
+  //   //TODO: Once the backend is up, send a asynchronous call to the backend to create a new message.
+  //   this.materialsSource.next([...this.materialsSource.getValue(), newMaterial]);
+  // }
 
 //   async deleteMaterial(index: number){
 //     //TODO: implement deleting of material.
@@ -86,7 +86,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Course } from '../../types/coursetypes';
+import { Course, Material } from '../../types/coursetypes';
 import { AuthService } from '../auth-service/auth.service';
 
 @Injectable({
@@ -95,7 +95,7 @@ import { AuthService } from '../auth-service/auth.service';
 
 export class CourseService {
 
-  private materialsSource = new BehaviorSubject<string[]>([]);
+  private materialsSource = new BehaviorSubject<Material[]>([]);
   private coursesSource = new BehaviorSubject<Course[]>([]);
 
   public materials$ = this.materialsSource.asObservable();
@@ -109,8 +109,20 @@ export class CourseService {
         console.log('User is not a professor');
       }
     });
+
    }
 
+   fetchMaterials(semester: string, courseAndSection: string){
+    this.http.get<any[]>(`http://127.0.0.1:8000/api/materials/get-materials-by-class-id/${courseAndSection}/`).subscribe({
+      next: (materials) => {
+        //@ts-ignore
+        this.materialsSource.next(materials.materials)
+        //@ts-ignore
+        console.log(materials.materials);
+      },
+      error: (error) => console.error('Error fetching materials:', error),
+    });
+   }
   // async addCourse() {
 
   // try {
@@ -163,12 +175,12 @@ export class CourseService {
     });
   }
 
-  async getMaterials(course_id: number) {
-    this.http.get<string[]>(`${this.apiUrl}/materials/all/${course_id}/`).subscribe({
-      next: (materials) => this.materialsSource.next(materials),
-      error: (error) => console.error('Error fetching materials:', error),
-    });
-  }
+  // async getMaterials(course_id: number) {
+  //   this.http.get<string[]>(`${this.apiUrl}/materials/all/${course_id}/`).subscribe({
+  //     next: (materials) => this.materialsSource.next(materials),
+  //     error: (error) => console.error('Error fetching materials:', error),
+  //   });
+  // }
 
   // async addMaterial(newMaterial: {title: string; category: string; course_id: number}) {
   //   try {
@@ -182,11 +194,11 @@ export class CourseService {
   //   }
   // }
 
-  async addMaterial(newMaterial: string) {
-    //TODO: Once the backend is up, send a asynchronous call to the backend to create a new message.
+  // async addMaterial(newMaterial: string) {
+  //   //TODO: Once the backend is up, send a asynchronous call to the backend to create a new message.
 
-    this.materialsSource.next([...this.materialsSource.getValue(), newMaterial]);
-  }
+  //   this.materialsSource.next([...this.materialsSource.getValue(), newMaterial]);
+  // }
 
   async deleteMaterial(material_id: number) {
     try {
@@ -222,14 +234,14 @@ export class CourseService {
   }
 
 
-  async updateMaterial(material_id: number, updatedMaterial: FormData, course_id: number) {
-    try {
-      const headers = new HttpHeaders().append('enctype', 'multipart/form-data');
-      this.http.put(`${this.apiUrl}/materials/update/${material_id}/`, updatedMaterial, { headers });
-      // Refresh the materials list after updating
-      this.getMaterials(course_id);
-    } catch (error) {
-      console.error('Error updating material:', error);
-    }
-  }
+  // async updateMaterial(material_id: number, updatedMaterial: FormData, course_id: number) {
+  //   try {
+  //     const headers = new HttpHeaders().append('enctype', 'multipart/form-data');
+  //     this.http.put(`${this.apiUrl}/materials/update/${material_id}/`, updatedMaterial, { headers });
+  //     // Refresh the materials list after updating
+  //     this.getMaterials(course_id);
+  //   } catch (error) {
+  //     console.error('Error updating material:', error);
+  //   }
+  // }
 }

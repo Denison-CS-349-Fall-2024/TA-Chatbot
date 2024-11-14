@@ -6,3 +6,8 @@ export interface Course  {
   semester: string,
   courseTitle: string
 }
+
+export interface Material {
+  title: string,
+  id: string,
+}
