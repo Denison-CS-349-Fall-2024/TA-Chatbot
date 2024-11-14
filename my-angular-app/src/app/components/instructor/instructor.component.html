@@ -1,9 +1,10 @@
 <div>
-  <p class="lowered-Welcome-Text"><b>Hello Instructor!</b></p>
+  <p class="lowered-Welcome-Text"><b>Hello  {{ (currentUser$ | async)?.name }}</b></p>
 
   <h1>Classrooms:</h1>
 
   <a [href] ="'/classroom/' + class.semester + '/' + class.department + class.courseNumber + '-' + class.section" *ngFor="let class of courses" class="bubble">{{ class.department.toUpperCase() + " " + class.courseNumber + "-" + class.section }}</a>
   <div><a class="bubble " href="add-ta">Add Class</a>
+    <h2> <a href="/student-dashboard" class="bubble ">Switch to Student view</a></h2>
   </div>
 </div>

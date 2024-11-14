@@ -1,4 +1,4 @@
-<p class="lowered-Welcome-Text"><b>Hello {{student}}!</b></p>
+<p class="lowered-Welcome-Text"><b>Hello  {{ (currentUser$ | async)?.name }}</b></p>
 
 <h1>Your TAs:</h1>
 

@@ -13,8 +13,8 @@ import { ChatService, Message } from '../../services/chat-service/chat.service';
 })
 export class ChatComponent {
 
-  @Input() semester: string | null = null;
-  @Input() courseAndSection!: string | null
+  @Input() semester!: string;
+  @Input() courseAndSection!: string;
   constructor(private chatService: ChatService) {}
 
   public messagesSubscription!: Subscription;
@@ -34,7 +34,7 @@ export class ChatComponent {
       return;
     }
     event.preventDefault();
-    this.chatService.addMessage({ isSentByUser: true, content: this.userInput });
+    this.chatService.addMessage({ isSentByUser: true, content: this.userInput }, this.semester, this.courseAndSection);
     this.userInput = "";
   }
   
