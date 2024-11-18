@@ -16,10 +16,12 @@ export class AuthGuard {
   canActivate(next: ActivatedRouteSnapshot, state: RouterStateSnapshot): | Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
 
 
-    if (this.authService.isAuthenticated() === false) {
-      this.authService.checkSessionStatus();
+    if (this.authService.isAuthenticated()) {
+      return true;
     }
-
-    return true;
+    else{
+      return this.router.createUrlTree(['/access-restricted']);
+    }
+    
   }
 }

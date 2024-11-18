@@ -5,6 +5,7 @@ import { InstructorPageComponent } from './pages/instructor-page/instructor-page
 import { AddTaPageComponent } from './pages/add-ta-page/add-ta-page.component';
 import { ClassroomPageComponent } from './pages/classroom-page/classroom-page.component';
 import { StudentDashboardPageComponent } from './pages/student-dashboard-page/student-dashboard-page.component';
+import { AccessRestrictedPageComponent } from './pages/access-restricted-page/access-restricted-page.component';
 import { AuthGuard } from './auth.guard';
 import { RoleGuard } from './role.guard';
 
@@ -16,5 +17,6 @@ export const routes: Routes = [
   {path: 'add-ta', component: AddTaPageComponent},
   {path: 'classroom', component: ClassroomPageComponent},
   {path: 'classroom/:semester/:courseAndSection', component: ClassroomPageComponent},
-  {path: 'student-dashboard', component: StudentDashboardPageComponent, canActivate: mapToCanActivate([AuthGuard])}
+  {path: 'student-dashboard', component: StudentDashboardPageComponent, canActivate: mapToCanActivate([AuthGuard])},
+  {path:'access-restricted', component:AccessRestrictedPageComponent}
 ];

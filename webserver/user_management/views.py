@@ -8,6 +8,7 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
+from django.shortcuts import redirect
 
 def profile(request):
     return render(request, 'profile.html')
@@ -20,12 +21,15 @@ def is_user_authenticated(request):
             "id": user.id,
             "email": user.email,
             "isProf": user.is_prof,
+            "role": "Professor" if user.is_prof else "Student",
             "name": user.name
         }
         return JsonResponse(response_data)
     
     return JsonResponse({"error": "User not authenticated"}, status=401) 
 
+def custom_redirect_view(request):
+    return redirect('http://127.0.0.1:4200/')  # Your Angular landing page
 
 @csrf_exempt
 def update_user_to_professor(request):

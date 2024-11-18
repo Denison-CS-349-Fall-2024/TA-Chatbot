@@ -28,10 +28,13 @@ from django.conf import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
-    # path('accounts/profile/', views.profile, name="profile"), #for authentication debug purposes
+    
+    # Alias `/login/` to the Allauth login page
+    path('login/', lambda request: redirect('/accounts/login/')),
 
-    path('api/chat/',include("chatbot_management.urls")),
-    path('api/users/', include('user_management.urls')), 
+    path('api/chat/', include("chatbot_management.urls")),
+    path('api/users/', include('user_management.urls')),
     path('api/materials/', include('material_management.urls')),
     path('class-management/', include('class_management.urls')),
 ]
+
