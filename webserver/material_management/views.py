@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 from pinecone import Pinecone, ServerlessSpec
 from langchain.text_splitter import CharacterTextSplitter
 from sentence_transformers import SentenceTransformer
-import PyPDF2
+from pypdf import PdfReader
 from openai import OpenAI
 import re
 from django.shortcuts import get_object_or_404
@@ -33,7 +33,7 @@ index_name = "course-embeddings"  # Use a unique index name for each course
 # Load PDF file
 def load_pdf(file_path):
     with open(file_path, 'rb') as file:
-        reader = PyPDF2.PdfReader(file)
+        reader = PdfReader(file)
         text = ''
         for page in reader.pages:
             text += page.extract_text()
@@ -65,21 +65,36 @@ def initialize_index(index_name, dimension = INDEX_DIMENSION, metric="cosine"):
     index = pc.Index(index_name)
     return index
 
-def delete_embeddings(index,class_id,material_name):
-    filter_criteria = {
-        "class_id": class_id,
-        "file_name": material_name
-    }
-
-    print(filter_criteria)
+def delete_embeddings(index, class_id, material_name):
+    prefix = f"{class_id}#{material_name}#"
     
-    # Perform the deletion with the filter criteria
-    index.delete(filter=filter_criteria)
+    # First, list all vectors with this prefix
+    vector_ids = []
+    pagination_token = None
+    
+    while True:
+        list_response = index.list_vectors(
+            prefix=prefix,
+            limit=10000,
+            pagination_token=pagination_token
+        )
+        
+        vector_ids.extend(list_response.vectors.ids)
+        
+        pagination_token = list_response.pagination.next
+        if not pagination_token:
+            break
+    
+    if vector_ids:
+        index.delete(ids=vector_ids)
+        print(f"Deleted {len(vector_ids)} vectors")
+    else:
+        print("No vectors found with the given prefix")
 
 def upload_embeddings(index, chunks, embeddings, class_id, material_name):
     vectors = [
         {
-            "id": f"{class_id}-{material_name}-chunk-{i}",
+            "id": f"{class_id}#{material_name}#chunk{i}",
             "values": embedding.tolist(),
             "metadata": {
                 "text": chunk,
@@ -89,9 +104,9 @@ def upload_embeddings(index, chunks, embeddings, class_id, material_name):
         }
         for i, (embedding, chunk) in enumerate(zip(embeddings, chunks))
     ]
-    print ("about to insert")
+    print("about to insert")
     index.upsert(vectors)
-    print("inserted succesfully")
+    print("inserted successfully")
 
 def parse_course_string(course_str):
 
@@ -118,35 +133,26 @@ def post_material(request):
             material_name = data.get('materialName', '')
             course_identififer = data.get("class_id", "")
             parsed_string = parse_course_string(course_identififer)
-            
 
-
-            print(parsed_string[0], parsed_string[1], parsed_string[2])
             course = Course.objects.get_course_by_course_identifier(parsed_string[0], parsed_string[1], parsed_string[2])
-
-            print("the course", course)
             
-            # Path for saving the uploaded file
-            file_path = os.path.join(settings.MEDIA_ROOT, file_name)
-            # Save the file to the 'uploads' directory
-            with open(file_path, 'wb+') as destination:
-                for chunk in file.chunks():
-                    destination.write(chunk)
+            # Directly read the PDF content from the uploaded file
+            reader = PdfReader(file)
+            text = ''
+            for page in reader.pages:
+                text += page.extract_text()
 
-            # Load PDF, split into chunks, and generate embeddings
-            text = load_pdf(file_path)  # Path to the uploaded PDF
+            # Continue with the existing processing
             chunks = split_text_into_chunks(text, chunk_size=250, chunk_overlap=50)
-
-            # Embed chunks and initialize Pinecone index
             embeddings = embed_chunks(chunks)
-            print("embed chunks succesfully")
+            print("embed chunks successfully")
             dimension = embeddings.shape[1]
             index = initialize_index(index_name, INDEX_DIMENSION)
-            print("index initilized succesfully")
+            print("index initialized successfully")
 
-            upload_embeddings(index,chunks,embeddings,class_id=course_identififer,material_name=material_name)
-            # Create a new CourseMaterial instance
+            upload_embeddings(index, chunks, embeddings, class_id=course_identififer, material_name=material_name)
             material = CourseMaterial.objects.create_material(title=material_name, category=material_type, course=course)
+            
             return JsonResponse({'message': 'File uploaded and material created successfully', 'material_id': material.id, 'fileName': file_name}, status=201)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
@@ -156,23 +162,18 @@ def post_material(request):
 def delete_material(request, material_id):
     if request.method == 'DELETE':
         try:
-            print("recieved a delete request")
-
-            print('test check')
-            # course_identifier = data.POST("class_id","")
-            # material_name = data.get('materialName', '')
             material = get_object_or_404(CourseMaterial, id=material_id)
             course = get_object_or_404(Course, id = material.course_id)
 
-            course_identifier = ""+course.department+str(course.course_number)+'-'+course.section
-            print(course_identifier, material.title)
+            course_identifier = f"{course.department}{course.course_number}-{course.section}#{material.title}"
+
             index = initialize_index(index_name, INDEX_DIMENSION)
-            print('initialization completed')
+            
+            for ids in index.list(prefix=course_identifier):
+                index.delete(ids = ids)
+                
+            material.delete()
 
-            delete_embeddings(index,class_id=course_identifier,material_name=material.title)
-            print('delete completed')
-
-            # material.delete()
             return JsonResponse({'message': 'File deleted successfully'}, status=200)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)

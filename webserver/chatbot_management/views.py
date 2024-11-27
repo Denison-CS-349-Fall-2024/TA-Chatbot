@@ -1,10 +1,8 @@
 import os
 from dotenv import load_dotenv
-from pinecone import Pinecone, ServerlessSpec
-from langchain.text_splitter import CharacterTextSplitter
+from pinecone import Pinecone
 from sentence_transformers import SentenceTransformer
 from django.views.decorators.csrf import csrf_exempt
-import PyPDF2
 from openai import OpenAI
 from django.http import JsonResponse
 import json
@@ -30,15 +28,13 @@ def search_embeddings(index, query_embedding, class_id, top_k=3):
     # Construct metadata filters for class_id and material_type
     query_filter = {
         'class_id': class_id,
-        # 'file_type': material_type
     }
     
-    # Perform the similarity search with metadata filters
     results = index.query(
         vector=query_embedding.tolist(),
         top_k=top_k,
         include_metadata=True,
-        filter=query_filter  # Filter by class_id and material_type
+        filter=query_filter
     )
     return results
 

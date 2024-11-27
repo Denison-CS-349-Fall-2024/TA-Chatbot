@@ -11,7 +11,7 @@ import { initFlowbite } from 'flowbite';
   styleUrl: './app.component.css'
 })
 export class AppComponent {
-  title: string = 'my-angular-app';
+  title: string = 'frontend';
   ngOnInit(): void {
     initFlowbite();
   }
