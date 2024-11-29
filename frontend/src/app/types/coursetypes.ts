@@ -1,12 +1,15 @@
 export interface Course  {
   id: string,
-  courseTitle: string
+  courseTitle: string,
   department: string,
   courseNumber: string,
   section: string,
   semester: string,
-  isActive: boolean,
-  credits: string
+  credits: string,
+  professorFirstName: string,
+  professorLastName: string,
+  pin: string,
+  isActive: boolean
 }
 
 export interface Material {

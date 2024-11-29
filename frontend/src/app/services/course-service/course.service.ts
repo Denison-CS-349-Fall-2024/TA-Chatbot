@@ -23,12 +23,12 @@ export class CourseService {
   constructor(private http: HttpClient, private authService: AuthService) {
     this.authService.currentUser.subscribe(user => {
       if (this.authService.isProfessor()) {
-        this.getCourses(this.authService.getId()!);
+        this.getInstructorCourses(this.authService.getId()!);
+      }else{
+        //TODO: Fetch courses for the students.
       }
     });
-
    }   
-
 
   async addCourse(name: string, section: string, department: string, course_number: string, credits: string) {
     try {
@@ -61,7 +61,7 @@ export class CourseService {
     }
   }
 
-  async getCourses(id: string) {
+  async getInstructorCourses(id: string) {
     this.http.get<{courses: Course[]}>(`${this.apiUrl}/class-management/courses/professor/${id}/`).subscribe({
       next: (response: {courses: Course[]}) => {
         this.archivedCoursesSource.next(response.courses.filter(course => !course.isActive))
@@ -69,6 +69,10 @@ export class CourseService {
       }, 
       error: (error) => console.error('Error fetching courses:', error),
     });
+  }
+
+  async getStudentCourses(id: string) {
+    //TODO: Fetch courses for the students.
   }
 
   async deleteMaterial(material_id: string) {
@@ -86,12 +90,18 @@ export class CourseService {
   }
 
 
-  fetchMaterials(semester: string, courseAndSection: string){
-    this.http.get<{materials: Material[]}>(`http://127.0.0.1:8000/api/materials/get-materials-by-class-id/${semester}/${courseAndSection}/`).subscribe({
-      next: (materials) => {
-        this.materialsSource.next(materials.materials)
-      },
-      error: (error) => console.error('Error fetching materials:', error),
+  async fetchMaterials(semester: string, courseAndSection: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.http.get<{materials: Material[]}>(`http://127.0.0.1:8000/api/materials/get-materials-by-class-id/${semester}/${courseAndSection}/`).subscribe({
+        next: (materials) => {
+          this.materialsSource.next(materials.materials)
+          resolve();
+        },
+        error: (error) => {
+          console.error('Error fetching materials:', error);
+          reject(error);
+        }
+      });
     });
    }
 

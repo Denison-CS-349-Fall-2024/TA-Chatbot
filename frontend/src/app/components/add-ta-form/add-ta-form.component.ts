@@ -2,7 +2,7 @@ import { Component, EventEmitter, Output, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { CourseService } from '../../services/course-service/course.service';
-import { ToastService } from '../../services/toast/toast.service';
+import { ToastService } from '../../services/toast-service/toast.service';
 import { ToastComponent } from '../toast/toast.component';
 import { Course } from '../../types/coursetypes';
 

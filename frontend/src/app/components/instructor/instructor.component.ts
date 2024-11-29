@@ -9,15 +9,17 @@ import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AddTaFormComponent } from '../add-ta-form/add-ta-form.component';
 import { ToastComponent } from '../toast/toast.component';
-import { ToastService } from '../../services/toast/toast.service';
+import { ToastService } from '../../services/toast-service/toast.service';
 import { TooltipComponent } from '../tooltip/tooltip.component';
 import { ViewPreferenceService } from '../../services/view-preference/view-preference.service';
 import { ConfirmationArchiveModalComponent } from '../confirmation-archive-modal/confirmation-archive-modal.component';
+import { ViewService } from '../../services/view-service/view.service';
+import { StudentDashboardComponent } from '../student-dashboard/student-dashboard.component';
 
 @Component({
   selector: 'app-instructor',
   standalone: true,
-  imports: [CommonModule, FormsModule, AddTaFormComponent, ToastComponent, RouterModule, TooltipComponent, ConfirmationArchiveModalComponent],
+  imports: [CommonModule, FormsModule, AddTaFormComponent, ToastComponent, RouterModule, TooltipComponent, ConfirmationArchiveModalComponent, StudentDashboardComponent],
   templateUrl: './instructor.component.html',
   styleUrl: './instructor.component.css'
 })
@@ -36,13 +38,15 @@ export class InstructorComponent implements OnInit, OnDestroy {
   protected showArchiveModal = false;
   protected showRestoreModal = false;
   protected selectedCourse: Course | null = null;
+  protected isStudentView = false;
 
   constructor(
     private courseService: CourseService,
     private authService: AuthService,
     private router: Router,
     protected toastService: ToastService,
-    private viewPreferenceService: ViewPreferenceService
+    private viewPreferenceService: ViewPreferenceService,
+    private viewService: ViewService
   ) {
     this.currentUser$ = this.authService.currentUser;
     this.view = this.viewPreferenceService.getViewMode();
@@ -123,7 +127,7 @@ export class InstructorComponent implements OnInit, OnDestroy {
   async archiveCourse(course: Course) {
     try {
       await this.courseService.archiveCourse(course.id);
-      await this.courseService.getCourses(this.authService.getId()!);
+      await this.courseService.getInstructorCourses(this.authService.getId()!);
       this.toastService.show(
         'success',
         'Course Archived',
@@ -141,7 +145,7 @@ export class InstructorComponent implements OnInit, OnDestroy {
   async unarchiveCourse(course: Course) {
     try {
       await this.courseService.unarchiveCourse(course.id);
-      await this.courseService.getCourses(this.authService.getId()!);
+      await this.courseService.getInstructorCourses(this.authService.getId()!);
       this.toastService.show(
         'success',
         'Course Restored',
@@ -167,7 +171,7 @@ export class InstructorComponent implements OnInit, OnDestroy {
   getFilteredCourses() {
     if (!this.courses) return [];
     
-    return this.courses.filter(course => {
+    let filtered = this.courses.filter(course => {
       const searchTerm = this.searchTerm.toLowerCase().trim();
       if (!searchTerm) return this.selectedSemester === 'all' || course.semester === this.selectedSemester;
 
@@ -182,6 +186,25 @@ export class InstructorComponent implements OnInit, OnDestroy {
       const matchesSemester = this.selectedSemester === 'all' || course.semester === this.selectedSemester;
       
       return matchesSearch && matchesSemester;
+    });
+
+    // Add semester sorting
+    return filtered.sort((a, b) => {
+      const aYear = parseInt(a.semester.slice(-4));
+      const bYear = parseInt(b.semester.slice(-4));
+      const aSeason = a.semester.slice(0, -4).toLowerCase();
+      const bSeason = b.semester.slice(0, -4).toLowerCase();
+      
+      if (aYear !== bYear) return bYear - aYear;
+      
+      const seasonOrder: Record<string, number> = {
+        spring: 0,
+        summer: 1,
+        fall: 2,
+        winter: 3
+      };
+      
+      return (seasonOrder[bSeason] ?? 0) - (seasonOrder[aSeason] ?? 0);
     });
   }
 
@@ -207,5 +230,32 @@ export class InstructorComponent implements OnInit, OnDestroy {
 
   toggleArchivedCourses() {
     this.showArchivedCourses = !this.showArchivedCourses;
+  }
+
+  toggleViewMode() {
+    this.isStudentView = !this.isStudentView;
+    this.viewService.setViewMode(this.isStudentView ? 'student' : 'instructor');
+  }
+
+  formatSemester(semester: string): string {
+    const season = semester.slice(0, -4);
+    const year = semester.slice(-4);
+    return `${season.charAt(0).toUpperCase()}${season.slice(1)} ${year}`;
+  }
+
+  getSemesterColor(semester: string): string {
+    const season = semester.slice(0, -4).toLowerCase();
+    switch (season) {
+      case 'fall':
+        return 'bg-orange-100 text-orange-800';
+      case 'spring':
+        return 'bg-green-100 text-green-800';
+      case 'summer':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'winter':
+        return 'bg-blue-100 text-blue-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
   }
 }

@@ -36,6 +36,7 @@ import { CommonModule } from '@angular/common';
       </div>
     </div>
   </div>
+  
   `,
   styleUrl: './confirmation-archive-modal.component.css'
 })
@@ -55,17 +56,17 @@ export class ConfirmationArchiveModalComponent {
   }
 
   get iconBackgroundClass(): string {
-    return this.type === 'archive' ? 'bg-yellow-100' : 'bg-blue-100';
+    return this.type === 'archive' ? 'bg-yellow-100' : 'bg-primary-100';
   }
 
   get iconColorClass(): string {
-    return this.type === 'archive' ? 'text-yellow-600' : 'text-blue-600';
+    return this.type === 'archive' ? 'text-yellow-600' : 'text-primary-600';
   }
 
   get actionButtonClass(): string {
     return this.type === 'archive' 
       ? 'bg-yellow-600 hover:bg-yellow-700 focus:ring-yellow-500'
-      : 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500';
+      : 'bg-primary-600 hover:bg-primary-700 focus:ring-primary-500';
   }
 
   onConfirm() {

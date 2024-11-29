@@ -27,7 +27,7 @@ def create_course(request):
             section = data.get('section')
             department = data.get('department')
             course_number = data.get('course_number')
-            semester = get_current_semester()
+            semester = data.get('semester', get_current_semester())
 
             # Check for existing course with same details
             existing_course = Course.objects.filter(
@@ -48,11 +48,13 @@ def create_course(request):
             pin = generate_random_string()
             professor = data.get('professor_id')
             credits = data.get('credits')
+            professor = get_object_or_404(User, id=professor)
+
             course = Course.objects.create_course(
                 name=name,
                 pin=pin,
                 section=section,
-                professor=professor,
+                professor=professor.id,
                 department=department,
                 course_number=course_number,
                 semester=semester,
@@ -68,7 +70,11 @@ def create_course(request):
                     'courseNumber': course.course_number,
                     'section': course.section,
                     'semester': course.semester,
-                    'isActive': course.is_active
+                    'credits': course.credits,
+                    'pin': course.pin,
+                    'isActive': course.is_active,
+                    'professorFirstName': professor.first_name,
+                    'professorLastName': professor.last_name
                 }
             }, status=201)
         except Exception as e:
@@ -103,15 +109,21 @@ def update_course(request):
                 course.credits = course_payload.get('credits')
 
             course.save()
+
+            professor = get_object_or_404(User, id=course.professor)
+
             return JsonResponse({'message': 'Course updated successfully', 'course': {
-                                    'id': str(course.id),
-                                    'courseTitle': course.name,
-                                    'department': course.department,
-                                    'courseNumber': course.course_number,
-                                    'section': course.section,
-                                    'semester': course.semester,
-                                    'isActive': course.is_active,
-                                    'credits': course.credits
+                    'id': str(course.id),
+                    'courseTitle': course.name,
+                    'department': course.department,
+                    'courseNumber': course.course_number,
+                    'section': course.section,
+                    'semester': course.semester,
+                    'credits': course.credits,
+                    'pin': course.pin,
+                    'isActive': course.is_active,
+                    'professorFirstName': professor.first_name,
+                    'professorLastName': professor.last_name
                                     }}, status=200) 
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
@@ -133,7 +145,7 @@ def courses_by_professor(request, professor_id):
     try:
         professor = get_object_or_404(User, id=professor_id)
         courses = Course.objects.filter(professor=professor_id)
-        courses_list = [{'id': course.id,'name': course.name, 'section':course.section, 'pin': course.pin, 'department': course.department, 'semester': course.semester, 'courseTitle': course.name, 'courseNumber': course.course_number, 'isActive': course.is_active, 'credits': course.credits} for course in courses]
+        courses_list = [{'id': course.id,'name': course.name, 'section':course.section, 'pin': course.pin, 'department': course.department, 'semester': course.semester, 'courseTitle': course.name, 'courseNumber': course.course_number, 'isActive': course.is_active, 'credits': course.credits, 'professorFirstName': professor.first_name, 'professorLastName': professor.last_name} for course in courses]
         
         return JsonResponse({'courses': courses_list}, status=200)
     except Exception as e:

@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { CourseService } from '../../services/course-service/course.service';
 import { HttpClient } from '@angular/common/http';
-import { ToastService } from '../../services/toast/toast.service';
+import { ToastService } from '../../services/toast-service/toast.service';
 
 interface FileType {
   value: string;
@@ -20,7 +20,7 @@ interface FileType {
     <!-- Modal toggle -->
     <button type="button" 
             (click)="openModal()"
-            class="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
+            class="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors duration-200">
       <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
       </svg>
@@ -45,7 +45,7 @@ interface FileType {
           <div class="absolute right-0 top-0 pr-4 pt-4">
             <button type="button" 
                     (click)="closeModal()"
-                    class="rounded-md bg-white dark:bg-gray-800 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                    class="rounded-md bg-white dark:bg-gray-800 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
               <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
               </svg>
@@ -53,8 +53,8 @@ interface FileType {
           </div>
 
           <div class="sm:flex sm:items-start">
-            <div class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
-              <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-primary-100 sm:mx-0 sm:h-10 sm:w-10">
+              <svg class="h-6 w-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
               </svg>
             </div>
@@ -80,7 +80,7 @@ interface FileType {
                      name="materialName"
                      required
                      [class.border-red-300]="!materialName && isSubmitting"
-                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm"
+                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm"
                      placeholder="e.g., Course Syllabus"
                      autocomplete="off"
                      >
@@ -108,7 +108,7 @@ interface FileType {
                         </div>
                       </div>
                       <svg *ngIf="selectedFileType === type.value" 
-                           class="h-5 w-5 text-blue-600" 
+                           class="h-5 w-5 text-primary-600" 
                            viewBox="0 0 20 20" 
                            fill="currentColor">
                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
@@ -149,7 +149,7 @@ interface FileType {
                 <input type="checkbox"
                        [(ngModel)]="enableAI"
                        name="enableAI"
-                       class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                       class="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500">
               </div>
               <div class="ml-3">
                 <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -166,7 +166,7 @@ interface FileType {
 
               <button type="submit"
                       [disabled]="isSubmitting || !isFormValid()"
-                      class="inline-flex justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                      class="inline-flex justify-center rounded-md border border-transparent bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
                 <svg *ngIf="isSubmitting" 
                      class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" 
                      xmlns="http://www.w3.org/2000/svg" 
@@ -180,7 +180,7 @@ interface FileType {
                 <button type="button"
                       (click)="closeModal()"
                       [disabled]="isSubmitting"
-                      class="mr-3 inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                      class="mr-3 inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
                 Cancel
               </button>
             </div>

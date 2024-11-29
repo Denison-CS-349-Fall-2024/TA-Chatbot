@@ -22,7 +22,8 @@ def is_user_authenticated(request):
             "id": user.id,
             "email": user.email,
             "isProf": user.is_prof,
-            "name": user.name
+            "firstName": user.first_name,
+            "lastName": user.last_name
         }
         return JsonResponse(response_data)
     
@@ -47,7 +48,6 @@ def update_user_to_professor(request):
             
             user.save()
 
-            # course = Course.objects.create_course(name=name, pin=pin, section=section, professor=professor, department=department, course_number = course_number, semester = semester)
             return JsonResponse({'message': f'{email} is now a professor'}, status=201)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)

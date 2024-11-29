@@ -18,5 +18,6 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
             user.is_prof = False
             user.is_staff = False
 
-        user.name = data['first_name'] 
+        user.first_name = data['first_name'] 
+        user.last_name = data['last_name']
         return user
