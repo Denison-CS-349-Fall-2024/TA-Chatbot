@@ -1,43 +1,169 @@
-<div class = "flex justify-center items-center w-screen h-screen bg-gray-100">
-  <div class=" bg-white rounded-xl shadow-xl p-8 mt-2">
-      <p class="lowered-Welcome-Text">Hello Instructor!</p>
+<!-- Modal Backdrop -->
+<div class="fixed inset-0 bg-black bg-opacity-50 z-40" (click)="handleClose()"></div>
 
-      <h1 class="truncate"><b>New TA Setup</b><a class="bubble hover:cursor-pointer">Create</a></h1>
-      <form class="mt-5" (ngSubmit)="this.addCourse()">
-        <div class="grid 2xl:grid-cols-2 grid-cols-1 md:gap-6">
-            <div class="mb-5">
-              <label for="courseField" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Course Name</label>
-              <input name = 'add-course-form-name' [(ngModel)]="this.addCourseData.name" type="courseField" id="courseField" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-slate-500! focus:border-slate-500! block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-slate-500 dark:focus:border-slate-500" placeholder="" autocomplete="off" required />
+<!-- Modal Content -->
+<div class="fixed inset-0 z-50 overflow-y-auto">
+  <div class="flex min-h-full items-center justify-center p-4">
+    <div class="relative transform overflow-hidden rounded-2xl bg-white shadow-xl transition-all max-w-2xl w-full" 
+         (click)="$event.stopPropagation()">
+      
+      <!-- Modal Header -->
+      <div class="bg-white px-6 py-4 border-b border-gray-200">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center">
+            <div class="bg-blue-100 rounded-lg p-2 mr-3">
+              <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+              </svg>
             </div>
-            <div class="mb-5">
-              <label for="sectionField" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Section</label>
-              <input name = 'add-course-form-section' [(ngModel)]="addCourseData.section" type="sectionField" id="sectionField" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-slate-500 focus:border-slate-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-slate-500 dark:focus:border-slate-500" required autocomplete="off"/>
-            </div>
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">
+              {{ duplicateData ? 'Duplicate Course' : 'Add New Course' }}
+            </h2>
+          </div>
+          <button class="text-gray-400 hover:text-gray-500" (click)="handleClose()">
+            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
-        <div class="grid 2xl:grid-cols-2 grid-cols-1 md:gap-6">
-          <div class="mb-5">
-            <label for="couse-number" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Course Number</label>
-            <input type="text" name = 'add-course-form-number' [(ngModel)]="this.addCourseData.courseNumber" type="courseField" id="courseField" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-slate-500! focus:border-slate-500! block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-slate-500 dark:focus:border-slate-500" placeholder="" autocomplete="off" required />
-          </div>
-          <div class="mb-5">
-            <label for="departments" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select a Department</label>
-            <select name="add-course-department" [(ngModel)]="this.addCourseData.department" id="departments" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-              <option selected>Choose a Department</option>
-              <option value="CS">Computer Science</option>
-              <option value="DA">Data Analytics</option>
-              <option value="MATH">Mathematics</option>
-              <option value="ECON">Economics</option>
-            </select>
-          </div>
       </div>
 
+      <!-- If duplicating, add an info message -->
+      <div *ngIf="duplicateData" class="mb-4 p-4 bg-blue-50 rounded-lg">
+        <p class="text-sm text-blue-700">
+          You're duplicating "{{ duplicateData.courseTitle }}". Please ensure that the course details are correct and different from the original course.
+        </p>
+      </div>
 
+      <!-- Modal Body -->
+      <div class="px-6 py-4">
+        <form (ngSubmit)="addCourse()" class="space-y-4">
+          <!-- Course Name -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Course Name *</label>
+            <input autocomplete="off"
+              type="text"
+              [(ngModel)]="addCourseData.name"
+              name="name"
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              [class.border-red-300]="!addCourseData.name && isSubmitting"
+              [disabled]="isSubmitting"
+              required
+              placeholder="e.g. Introduction to Data Analytics"
+            >
+          </div>
 
-        <div class= "materials-container">
-          <app-ta-materials />
-        </div>
+          <div class="grid grid-cols-2 gap-4">
+            <!-- Course Number -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Course Number *</label>
+              <input autocomplete="off"
+                type="text"
+                [(ngModel)]="addCourseData.courseNumber"
+                name="courseNumber"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                [class.border-red-300]="!addCourseData.courseNumber && isSubmitting"
+                [disabled]="isSubmitting"
+                required
+                placeholder="e.g. 101"
+              >
+            </div>
 
-          <button type="submit" class="text-white w-full mt-5 bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700">Create Class</button>
-      </form>
-  <div>
+            <!-- Section -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Section *</label>
+              <input autocomplete="off"
+                type="text"
+                [(ngModel)]="addCourseData.section"
+                name="section"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                [class.border-red-300]="!addCourseData.section && isSubmitting"
+                [disabled]="isSubmitting"
+                required
+                placeholder="e.g.01"
+              >
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <!-- Department -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Department *</label>
+              <select
+                [(ngModel)]="addCourseData.department"
+                name="department"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                [class.border-red-300]="addCourseData.department === 'N/A' && isSubmitting"
+                [disabled]="isSubmitting"
+              >
+                <option value="N/A">Select Department</option>
+                <option value="CS">Computer Science</option>
+                <option value="DA">Data Analytics</option>
+                <option value="MATH">Mathematics</option>
+                <option value="ECON">Economics</option>
+                <option value="PHYS">Physics</option>
+                <option value="CHEM">Chemistry</option>
+                <option value="BIO">Biology</option>
+              </select>
+            </div>
+
+            <!-- Credits -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Credits *</label>
+              <select
+                [(ngModel)]="addCourseData.credits"
+                name="credits"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                required
+              >
+                <option value="">Select Credits</option>
+                <option value="1">1 Credit</option>
+                <option value="2">2 Credits</option>
+                <option value="3">3 Credits</option>
+                <option value="4">4 Credits</option>
+              </select>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="bg-gray-50 px-6 py-4 flex justify-end space-x-3">
+        <button
+          type="button"
+          class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          (click)="handleClose()"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          [disabled]="isSubmitting || !isFormValid()"
+          (click)="addCourse()"
+          class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <span *ngIf="!isSubmitting">Create Course</span>
+          <span *ngIf="isSubmitting" class="flex items-center">
+            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Creating...
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="fixed bottom-0 right-0 p-6 space-y-4 z-50">
+  <app-toast *ngFor="let toast of toastService.toasts$ | async"
+             [type]="toast.type"
+             [title]="toast.title"
+             [message]="toast.message"
+             [show]="true"
+             (dismissed)="toastService.dismiss(toast.id)">
+  </app-toast>
 </div>

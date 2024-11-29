@@ -1,5 +1,9 @@
-@if (this.currentUser?.isProf === true){
-  <app-instructor />
+@if(this.currentUser){
+  @if (this.currentUser.isProf === true){
+    <app-instructor />
+  }@else{
+    <app-student-dashboard />
+  }
 }@else{
-  <app-student-dashboard />
+  <app-loading />
 }

@@ -37,6 +37,28 @@ export class AuthService {
     );
   }
 
+  async logout() {
+    try {
+
+      await this.http.get('http://127.0.0.1:8000/api/users/logout/', { 
+        withCredentials: true 
+      }).toPromise();
+      
+      // Clear local state
+      this.currentUserSubject.next(null);
+      this.cookieService.delete('userType');
+      this.cookieService.delete('sessionid');
+
+      // Redirect to landing page
+      window.location.href = '/';
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Still clear local state and redirect even if there's an error
+      this.currentUserSubject.next(null);
+      window.location.href = '/';
+    }
+  }
+
   isAuthenticated(): boolean {
     return this.currentUserSubject.value !== null;
   }

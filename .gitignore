@@ -164,3 +164,4 @@ cython_debug/
 bin/
 
 pyvenv.cfg
+uploads/

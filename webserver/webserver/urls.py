@@ -20,7 +20,7 @@ from user_management import views
 from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
 from django.http import JsonResponse
 from django.shortcuts import redirect
-
+from django.contrib.auth import logout
 import os
 from django.conf import settings
 

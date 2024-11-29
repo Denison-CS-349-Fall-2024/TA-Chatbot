@@ -2,8 +2,8 @@ from django.db import models
 from user_management.models import User
 
 class CourseManager(models.Manager):
-    def create_course(self, name, section, pin, professor, department, course_number, semester):
-        course = self.create(name=name,section=section,pin=pin,professor=professor, department=department, semester=semester, course_number=course_number)
+    def create_course(self, name, section, pin, professor, department, course_number, semester, credits):
+        course = self.create(name=name,section=section,pin=pin,professor=professor, department=department, semester=semester, course_number=course_number, is_active=True, credits=credits)
         return course
     
     def delete_course(self, course_id):
@@ -38,6 +38,8 @@ class Course(models.Model):
     course_number = models.IntegerField(default=0)
     pin = models.CharField(max_length=255)
     professor = models.CharField(max_length=255)
+    is_active = models.BooleanField(default=True)
+    credits = models.IntegerField(default=4)
     objects = CourseManager()
     def __str__(self):
         return self.name

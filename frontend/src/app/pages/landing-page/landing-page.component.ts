@@ -4,11 +4,12 @@ import { InstructorComponent } from '../../components/instructor/instructor.comp
 import { StudentDashboardComponent } from '../../components/student-dashboard/student-dashboard.component';
 import { Subscription } from 'rxjs';
 import { User } from '../../types/usertype';
+import { LoadingComponent } from '../../components/loading/loading.component';
 
 @Component({
   selector: 'app-landing-page',
   standalone: true,
-  imports: [StudentDashboardComponent, InstructorComponent],
+  imports: [StudentDashboardComponent, InstructorComponent, LoadingComponent],
   templateUrl: './landing-page.component.html',
   styleUrl: './landing-page.component.css'
 })

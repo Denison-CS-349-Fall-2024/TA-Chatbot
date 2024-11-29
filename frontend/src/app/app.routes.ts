@@ -7,6 +7,7 @@ import { ClassroomPageComponent } from './pages/classroom-page/classroom-page.co
 import { StudentDashboardPageComponent } from './pages/student-dashboard-page/student-dashboard-page.component';
 import { AuthGuard } from './auth.guard';
 import { RoleGuard } from './role.guard';
+import { LoadingComponent } from './components/loading/loading.component';
 
 export const routes: Routes = [
   {path: '', component: LandingPageComponent},
@@ -16,5 +17,6 @@ export const routes: Routes = [
   {path: 'add-ta', component: AddTaPageComponent},
   {path: 'classroom', component: ClassroomPageComponent},
   {path: 'classroom/:semester/:courseAndSection', component: ClassroomPageComponent},
-  {path: 'student-dashboard', component: StudentDashboardPageComponent, canActivate: mapToCanActivate([AuthGuard])}
+  {path: 'student-dashboard', component: StudentDashboardPageComponent, canActivate: mapToCanActivate([AuthGuard])},
+  {path: 'loading-test', component: LoadingComponent}
 ];

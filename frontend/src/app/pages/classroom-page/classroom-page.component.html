@@ -1,12 +1,440 @@
-<div class="w-[30vw]">
-  <h1 class="mb-2"><b>
-      @if(courseAndSection !== null){
-        {{ this.courseAndSection.toUpperCase()}}
-        }@else{
-          CS349-01
-      }
-    </b> <button class="bubble ">Switch to Student view</button></h1>
-  <div class="ml-[50px]">
-      <app-ta-materials [semester]="this.semester" [courseAndSection]="this.courseAndSection" />
-  </div>
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+  <!-- Header with Course Info -->
+  <header class="bg-white dark:bg-gray-800 shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div class="flex justify-between items-center">
+        <div>
+          <div class="flex items-center space-x-4">
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+              {{ courseAndSection.toUpperCase()}}
+            </h1>
+            <span class="px-3 py-1 text-sm font-medium bg-blue-100 text-blue-800 rounded-full">
+              {{ semester }}
+            </span>
+          </div>
+          <p class="mt-2 text-sm text-gray-500 dark:text-gray-400 flex items-center">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            Last updated: {{ lastUpdated | date:'medium' }}
+          </p>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="flex items-center space-x-4">
+
+          <div class="relative">
+            <button (click)="toggleSettingsMenu()"
+                    class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+              <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
+            </button>
+
+            <!-- Settings Dropdown -->
+            <div *ngIf="showSettingsMenu" 
+                 (clickOutside)="closeSettingsMenu()"
+                 class="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white dark:bg-gray-700 ring-1 ring-black ring-opacity-5">
+              <div class="py-1">
+                <button (click)="exportCourseData()" 
+                        class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600">
+                  Export Data
+                </button>
+                <button (click)="generateReport()" 
+                        class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600">
+                  Generate Report
+                </button>
+                <button (click)="sendBulkMessage()" 
+                        class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600">
+                  Send Bulk Message
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <div class="mt-6 border-b border-gray-200 dark:border-gray-700">
+        <nav class="-mb-px flex space-x-8">
+          <button *ngFor="let tab of tabs"
+                  (click)="setSelectedTab(tab)"
+                  [class]="selectedTab === tab ? 
+                    'border-blue-500 text-blue-600 dark:text-blue-400 border-b-2' : 
+                    'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300'"
+                  class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm capitalize flex items-center">
+            <!-- Tab Icons -->
+            <ng-container [ngSwitch]="tab">
+              <!-- Materials Icon -->
+              <svg *ngSwitchCase="'materials'" class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <!-- Students Icon -->
+              <svg *ngSwitchCase="'students'" class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+              <!-- Settings Icon -->
+              <svg *ngSwitchCase="'settings'" class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </ng-container>
+            {{ tab }}
+          </button>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="flex justify-center items-center py-12">
+      <div class="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
+    </div>
+
+    <!-- Students Tab -->
+    <div *ngIf="!isLoading && selectedTab === 'students'" class="space-y-6">
+      <!-- Student Management Header -->
+      <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
+          <!-- Search -->
+          <div class="relative flex-1 max-w-lg">
+            <input [(ngModel)]="studentSearchTerm"
+                   (input)="filterStudents()"
+                   type="text"
+                   class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600"
+                   placeholder="Search students...">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center">
+              <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex space-x-4">
+            <button class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+              </svg>
+              Export List
+            </button>
+            <button class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+              </svg>
+              Add Student
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Student List -->
+      <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead class="bg-gray-50 dark:bg-gray-700">
+              <tr>
+                <th *ngFor="let header of ['Name', 'Email', 'Status', 'Last Active', 'Actions']"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  <div class="flex items-center space-x-1">
+                    <span>{{ header }}</span>
+                    <button (click)="sortStudents(header.toLowerCase())" class="text-gray-400 hover:text-gray-500">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"/>
+                      </svg>
+                    </button>
+                  </div>
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+              <tr *ngFor="let student of filteredStudents" 
+                  class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="h-10 w-10 flex-shrink-0">
+                      <div class="h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center">
+                        <span class="text-sm font-medium text-gray-600 dark:text-gray-300">
+                          {{ student.name.charAt(0) }}
+                        </span>
+                      </div>
+                    </div>
+                    <div class="ml-4">
+                      <div class="text-sm font-medium text-gray-900 dark:text-white">
+                        {{ student.name }}
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm text-gray-900 dark:text-white">{{ student.email }}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span [class]="'px-2 py-1 text-xs font-medium rounded-full ' + 
+                               (student.status === 'Enrolled' ? 'bg-green-100 text-green-800' : 
+                                student.status === 'Waitlisted' ? 'bg-yellow-100 text-yellow-800' : 
+                                'bg-red-100 text-red-800')">
+                    {{ student.status | titlecase }}
+                  </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                  {{ student.lastActive | date:'medium' }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <div class="flex items-center space-x-3">
+                    <button class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
+                      View Details
+                    </button>
+                    <button class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
+                      Remove
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Materials Tab -->
+    <div *ngIf="!isLoading && selectedTab === 'materials'" class="space-y-6">
+      <!-- Empty State -->
+      <div *ngIf="courseMaterials.length === 0" 
+           class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-12 text-center">
+        <div class="mx-auto h-24 w-24 text-gray-400">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" 
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+        </div>
+        <h3 class="mt-4 text-lg font-medium text-gray-900 dark:text-gray-100">No materials yet</h3>
+        <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+          Get started by adding course materials for your students.
+        </p>
+        <div class="mt-6">
+          @if (semester && courseAndSection) {
+            <app-add-material-modal [semester]="semester" [courseAndSection]="courseAndSection"></app-add-material-modal>
+          }
+        </div>
+      </div>
+
+      <!-- Materials List -->
+      <div *ngIf="courseMaterials.length > 0" class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+        <div class="p-4 sm:p-6">
+          <div class="flex justify-between items-center mb-6">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white">Course Materials</h3>
+            @if (semester && courseAndSection) {
+              <app-add-material-modal [semester]="semester" [courseAndSection]="courseAndSection"></app-add-material-modal>
+            }
+          </div>
+
+          <ul class="space-y-3">
+            <li *ngFor="let material of courseMaterials" 
+                class="group relative rounded-lg border border-gray-100 dark:border-gray-700 hover:border-blue-100 dark:hover:border-blue-900 bg-gradient-to-r from-white to-gray-50 dark:from-gray-800 dark:to-gray-750 hover:from-blue-50 hover:to-white dark:hover:from-gray-800 dark:hover:to-gray-750 transition-all duration-300">
+              <div class="flex items-center p-4">
+                <!-- Document Icon with dynamic color -->
+                <div class="flex-shrink-0">
+                  <div [class]="'p-2 rounded-lg ' + (material.type === 'pdf' ? 'bg-red-50 dark:bg-red-900/20' : 'bg-blue-50 dark:bg-blue-900/20')">
+                    <svg class="w-6 h-6" [class]="material.type === 'pdf' ? 'text-red-500 dark:text-red-400' : 'text-blue-500 dark:text-blue-400'" 
+                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                            d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                    </svg>
+                  </div>
+                </div>
+
+                <!-- Content -->
+                <div class="min-w-0 flex-1 ml-4">
+                  <div class="flex items-center justify-between">
+                    <button (click)="viewMaterial(material)" 
+                            class="text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400">
+                      {{ material.title }}
+                    </button>
+                  </div>
+
+                  <div class="mt-2 flex items-center text-xs">
+                    <!-- File type badge -->
+                    <span [class]="'px-2 py-1 rounded-full uppercase font-medium ' + 
+                                  (material.type === 'pdf' ? 
+                                  'bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400' : 
+                                  'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400')">
+                      {{ material.type }}
+                    </span>
+                    <span class="mx-2 text-gray-300 dark:text-gray-600">•</span>
+                    <span class="text-gray-500 dark:text-gray-400">{{ formatFileSize(material.size) }}</span>
+                    <span class="mx-2 text-gray-300 dark:text-gray-600">•</span>
+                    <time class="text-gray-500 dark:text-gray-400">{{ material.uploadDate | date:'mediumDate' }}</time>
+                  </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="ml-4 flex-shrink-0">
+                  <div class="flex space-x-2">
+                    <button (click)="downloadMaterial(material)" 
+                            class="p-2 rounded-full text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700">
+                      <span class="sr-only">Download</span>
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                      </svg>
+                    </button>
+                    <button *ngIf="!isStudentView" 
+                            (click)="deleteMaterial(material)"
+                            class="p-2 rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20">
+                      <span class="sr-only">Delete</span>
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Document Viewer Modal -->
+      <!-- <div *ngIf="selectedMaterial" 
+           class="fixed inset-0 overflow-hidden z-50"
+           role="dialog"
+           aria-modal="true">
+        <div class="absolute inset-0 overflow-hidden">
+          <div class="absolute inset-0 bg-gray-500 bg-opacity-75 transition-opacity" 
+               (click)="closeViewer()"></div>
+          <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
+            <div class="pointer-events-auto relative w-screen max-w-4xl">
+              <div class="flex h-full flex-col overflow-y-scroll bg-white dark:bg-gray-800 shadow-xl">
+                <div class="flex items-center justify-between px-4 py-3 border-b dark:border-gray-700">
+                  <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                    {{ selectedMaterial.title }}
+                  </h3>
+                  <button (click)="closeViewer()" 
+                          class="rounded-md text-gray-400 hover:text-gray-500 focus:outline-none">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                  </button>
+                </div>
+                <div class="relative flex-1 px-4 py-6">
+                  <ng-container [ngSwitch]="selectedMaterial.type">
+                    <iframe *ngSwitchCase="'pdf'"
+                            [src]="selectedMaterial.url | safe:'resourceUrl'"
+                            class="w-full h-full border-0"
+                            type="application/pdf">
+                    </iframe>
+                    <div *ngSwitchCase="'document'" class="h-full">
+
+                      <ngx-doc-viewer [url]="selectedMaterial.url"
+                                    viewer="google"
+                                    class="w-full h-full">
+                      </ngx-doc-viewer>
+                    </div>
+                    <div *ngSwitchDefault class="flex items-center justify-center h-full">
+                      <p class="text-gray-500 dark:text-gray-400">
+                        Preview not available for this file type
+                      </p>
+                    </div>
+                  </ng-container>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>-->
+    </div> 
+
+    <!-- Settings Tab -->
+    <div *ngIf="!isLoading && selectedTab === 'settings'" class="space-y-6">
+      <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
+        <div class="p-6">
+          <h2 class="text-lg font-medium text-gray-900 dark:text-white mb-6">Course Settings</h2>
+          
+          <!-- Course Information -->
+          <div class="space-y-6">
+            <div>
+              <h3 class="text-md font-medium text-gray-900 dark:text-white mb-4">Basic Information</h3>
+              <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Course Name
+                  </label>
+                  <input [(ngModel)]="courseSettings.name" 
+                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Section
+                  </label>
+                  <input [(ngModel)]="courseSettings.section" 
+                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                </div>
+              </div>
+            </div>
+
+            <!-- Visibility Settings -->
+            <div>
+              <h3 class="text-md font-medium text-gray-900 dark:text-white mb-4">Visibility Settings</h3>
+              <div class="space-y-4">
+                <label class="flex items-center">
+                  <input type="checkbox" 
+                         [(ngModel)]="courseSettings.isVisible"
+                         class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                  <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                    Make course visible to students
+                  </span>
+                </label>
+                <label class="flex items-center">
+                  <input type="checkbox" 
+                         [(ngModel)]="courseSettings.allowStudentDiscussions"
+                         class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                  <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                    Allow student discussions
+                  </span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Save Button -->
+            <div class="flex justify-end">
+              <button (click)="saveSettings()" 
+                      class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<app-confirmation-modal
+  *ngIf="materialToDelete"
+  [title]="'Delete Material'"
+  [message]="'Are you sure you want to delete ' + materialToDelete.title + '? This action cannot be undone.'"
+  (confirm)="handleDeleteConfirm()"
+  (cancel)="handleDeleteCancel()">
+</app-confirmation-modal>
+
+<div class="fixed bottom-0 right-0 p-6 space-y-4 z-50">
+  <app-toast *ngFor="let toast of toastService.toasts$ | async"
+             [type]="toast.type"
+             [title]="toast.title"
+             [message]="toast.message"
+             [show]="true"
+             (dismissed)="toastService.dismiss(toast.id)">
+  </app-toast>
 </div>

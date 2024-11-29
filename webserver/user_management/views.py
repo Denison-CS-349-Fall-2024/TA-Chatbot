@@ -7,6 +7,8 @@ from .models import User
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import redirect
+from django.contrib.auth import logout
 import json
 
 def profile(request):
@@ -26,6 +28,10 @@ def is_user_authenticated(request):
     
     return JsonResponse({"error": "User not authenticated"}, status=401) 
 
+@csrf_exempt
+def customLogout(request):
+    logout(request)
+    return redirect('/')
 
 @csrf_exempt
 def update_user_to_professor(request):
