@@ -31,7 +31,7 @@ def is_user_authenticated(request):
 def update_user_to_professor(request):
     if request.method == 'PATCH':
         try:
-            data = json.loads(request.body)  
+            data = json.loads(request.body)
             email = data.get('email')
 
             user = User.objects.get(email=email)
