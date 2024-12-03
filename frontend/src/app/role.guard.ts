@@ -26,7 +26,7 @@ export class RoleGuard {
           } else if (!isProf) {
             return true;
           } else {
-            return this.router.parseUrl(isProf ? '/student-dashboard' : '/');
+            return this.router.parseUrl(isProf ? '/access-restricted' : '/');
           }
         })
       );

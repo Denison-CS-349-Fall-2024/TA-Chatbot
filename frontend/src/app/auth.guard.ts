@@ -17,13 +17,13 @@ export class AuthGuard {
 
   canActivate(next: ActivatedRouteSnapshot, state: RouterStateSnapshot): | Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
 
-
     if (this.authService.isAuthenticated() === false) {
       this.authService.checkSessionStatus();
     }
 
     return true;
   }
+    
 
   // canActivate(next: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | UrlTree> {
   //   return this.authService.checkSessionStatus().pipe(

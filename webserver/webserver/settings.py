@@ -79,7 +79,8 @@ MIDDLEWARE = [
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    "http://127.0.0.1:4200",
+    'http://127.0.0.1:4200',
+    'http://localhost:4200',
 ]
 
 ROOT_URLCONF = 'webserver.urls'
@@ -189,11 +190,27 @@ ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USER_MODEL_USERNAME_FIELD = 'email'
 
-LOGIN_REDIRECT_URL = 'http://127.0.0.1:4200/instructor-dashboard/'
+LOGIN_REDIRECT_URL = "http://127.0.0.1:4200"  # Change to a simple page that exists
+
 # LOGIN_REDIRECT_URL = 'get-csrf-token/'
 
 # Allow your Angular app’s origin
 CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:4200",
+    'http://localhost:4200',
 ]
 CORS_ALLOW_CREDENTIALS = True
+
+LOGGING = {
+    'version': 1,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'DEBUG',
+    },
+}
+

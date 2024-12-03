@@ -10,6 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import redirect
 from django.contrib.auth import logout
 import json
+from django.shortcuts import redirect
 
 def profile(request):
     return render(request, 'profile.html')
@@ -33,6 +34,9 @@ def is_user_authenticated(request):
 def customLogout(request):
     logout(request)
     return redirect('/')
+
+def custom_redirect_view(request):
+    return redirect('http://127.0.0.1:4200/')  # Your Angular landing page
 
 @csrf_exempt
 def update_user_to_professor(request):

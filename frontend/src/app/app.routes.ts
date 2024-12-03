@@ -4,6 +4,7 @@ import { LandingPageComponent } from './pages/landing-page/landing-page.componen
 import { InstructorPageComponent } from './pages/instructor-page/instructor-page.component';
 import { ClassroomPageComponent } from './pages/classroom-page/classroom-page.component';
 import { StudentDashboardPageComponent } from './pages/student-dashboard-page/student-dashboard-page.component';
+import { AccessRestrictedPageComponent } from './pages/access-restricted-page/access-restricted-page.component';
 import { AuthGuard } from './auth.guard';
 import { RoleGuard } from './role.guard';
 import { LoadingComponent } from './components/loading/loading.component';
@@ -17,5 +18,6 @@ export const routes: Routes = [
   {path: 'student-dashboard', component: StudentDashboardPageComponent, canActivate: mapToCanActivate([AuthGuard])},
   {path: 'loading-test', component: LoadingComponent},
   {path: 'not-found', component: NotFoundComponent},
-  {path: '**', redirectTo: 'not-found'}
+  // {path: '**', redirectTo: 'not-found'},
+  {path:'access-restricted', component:AccessRestrictedPageComponent}
 ];
