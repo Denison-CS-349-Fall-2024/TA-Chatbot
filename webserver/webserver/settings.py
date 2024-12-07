@@ -23,12 +23,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 MEDIA_ROOT = os.path.join(BASE_DIR, 'uploads')
 MEDIA_URL = '/uploads/'
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_URL = '/static/'
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-ho&am+5!=)8j$=f&dte0k$*yemr8n)m4xb)ja9e2l_og3%3bt!'
+
+SECRET_KEY = env('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -47,9 +51,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'user_management',
-    'class_management',        # Manages classes and pins
-    'chatbot_management',      # Handles chatbot interactions
-    'material_management',     # Manages uploaded materials
+    'class_management', # Manages classes and pins
+    'chatbot_management', # Handles chatbot interactions
+    'material_management', # Manages uploaded materials
+    'student_management', # Manages student class enrollments
     "corsheaders",
     
     # For authentication:
@@ -75,7 +80,8 @@ MIDDLEWARE = [
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    "http://127.0.0.1:4200",
+    'http://127.0.0.1:4200',
+    'http://localhost:4200',
 ]
 
 ROOT_URLCONF = 'webserver.urls'
@@ -106,11 +112,11 @@ WSGI_APPLICATION = 'webserver.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'ta_chatbot_db',
-        'USER': 'postgres',
-        'PASSWORD': 'example',
-        'HOST': 'localhost',  # Use the service name from docker-compose.yml
-        'PORT': '5432',
+        'NAME': env('POSTGRES_DB'),
+        'USER': env('POSTGRES_USER'),
+        'PASSWORD': env('POSTGRES_PASSWORD'),
+        'HOST': env('POSTGRES_HOST'),
+        'PORT': env('POSTGRES_PORT'),
     }
 }
 
@@ -185,11 +191,27 @@ ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USER_MODEL_USERNAME_FIELD = 'email'
 
-LOGIN_REDIRECT_URL = 'http://127.0.0.1:4200/instructor-dashboard/'
+LOGIN_REDIRECT_URL = "http://127.0.0.1:4200"  # Change to a simple page that exists
+
 # LOGIN_REDIRECT_URL = 'get-csrf-token/'
 
 # Allow your Angular app’s origin
 CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:4200",
+    'http://localhost:4200',
 ]
 CORS_ALLOW_CREDENTIALS = True
+
+LOGGING = {
+    'version': 1,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'DEBUG',
+    },
+}
+

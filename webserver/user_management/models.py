@@ -26,7 +26,8 @@ class CustomerUserManager(UserManager):
 class User(AbstractBaseUser, PermissionsMixin):
     username = None
     email = models.EmailField('email adress', unique=True)
-    name = models.CharField(max_length=255, blank=True, default='')
+    first_name = models.CharField(max_length=255, blank=True, default='')
+    last_name = models.CharField(max_length=255, blank=True, default='')
     is_prof = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
@@ -44,4 +45,4 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name_plural = 'Users'
 
     def get_full_name(self):
-        return self.name
+        return f"{self.first_name} {self.last_name}"

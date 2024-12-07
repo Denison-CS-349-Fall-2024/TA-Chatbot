@@ -12,5 +12,3 @@ pc = Pinecone(
 
 # Create index if it doesn't exist (you mentioned it exists, but keep it in case you need it later)
 index_name = "myenbeddings"
-
-print("pinecone setup complete")

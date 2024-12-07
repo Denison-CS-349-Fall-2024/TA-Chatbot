@@ -20,7 +20,7 @@ from user_management import views
 from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
 from django.http import JsonResponse
 from django.shortcuts import redirect
-
+from django.contrib.auth import logout
 import os
 from django.conf import settings
 
@@ -28,10 +28,14 @@ from django.conf import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
-    # path('accounts/profile/', views.profile, name="profile"), #for authentication debug purposes
+    
+    # Alias `/login/` to the Allauth login page
+    path('login/', lambda request: redirect('/accounts/login/')),
 
-    path('api/chat/',include("chatbot_management.urls")),
-    path('api/users/', include('user_management.urls')), 
+    path('api/chat/', include("chatbot_management.urls")),
+    path('api/users/', include('user_management.urls')),
     path('api/materials/', include('material_management.urls')),
     path('class-management/', include('class_management.urls')),
+    path('student-management/', include('student_management.urls'))
 ]
+

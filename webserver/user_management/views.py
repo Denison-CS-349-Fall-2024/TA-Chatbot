@@ -7,7 +7,10 @@ from .models import User
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import redirect
+from django.contrib.auth import logout
 import json
+from django.shortcuts import redirect
 
 def profile(request):
     return render(request, 'profile.html')
@@ -20,18 +23,26 @@ def is_user_authenticated(request):
             "id": user.id,
             "email": user.email,
             "isProf": user.is_prof,
-            "name": user.name
+            "firstName": user.first_name,
+            "lastName": user.last_name
         }
         return JsonResponse(response_data)
     
     return JsonResponse({"error": "User not authenticated"}, status=401) 
 
+@csrf_exempt
+def customLogout(request):
+    logout(request)
+    return redirect('/')
+
+def custom_redirect_view(request):
+    return redirect('http://127.0.0.1:4200/')  # Your Angular landing page
 
 @csrf_exempt
 def update_user_to_professor(request):
     if request.method == 'PATCH':
         try:
-            data = json.loads(request.body)  
+            data = json.loads(request.body)
             email = data.get('email')
 
             user = User.objects.get(email=email)
@@ -41,7 +52,6 @@ def update_user_to_professor(request):
             
             user.save()
 
-            # course = Course.objects.create_course(name=name, pin=pin, section=section, professor=professor, department=department, course_number = course_number, semester = semester)
             return JsonResponse({'message': f'{email} is now a professor'}, status=201)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
