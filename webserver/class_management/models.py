@@ -37,7 +37,7 @@ class Course(models.Model):
     semester = models.CharField(max_length=255, default="fall2024") #default value needs to be udated
     course_number = models.IntegerField(default=0)
     pin = models.CharField(max_length=255)
-    professor = models.CharField(max_length=255)
+    professor = models.CharField(max_length=255) #make this a foreign key
     objects = CourseManager()
     def __str__(self):
         return self.name

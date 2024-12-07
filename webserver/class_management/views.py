@@ -62,21 +62,3 @@ def courses_by_professor(request, professor_id):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
     
-@require_http_methods(["GET"])
-def course_by_pin(request, course_pin):
-    try:
-        course = Course.objects.get(pin=course_pin)
-    except Course.DoesNotExist:
-        return JsonResponse({'error': 'Course not found'}, status=404)
-
-    course_data = {
-        'id': course.id,
-        'name': course.name,
-        'section': course.section,
-        'pin': course.pin,
-        'department': course.department,
-        'semester': course.semester,
-        'courseTitle': course.name,
-        'courseNumber': course.course_number,
-    }
-    return JsonResponse(course_data, status=200)
