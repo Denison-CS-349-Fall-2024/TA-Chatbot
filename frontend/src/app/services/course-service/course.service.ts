@@ -3,6 +3,7 @@ import { BehaviorSubject, catchError, Observable, tap } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Course, Material } from '../../types/coursetypes';
 import { AuthService } from '../auth-service/auth.service';
+import { environment } from '../../../environment/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +19,7 @@ export class CourseService {
   public courses$ = this.coursesSource.asObservable();
   public archivedCourses$ = this.archivedCoursesSource.asObservable();
 
-  private apiUrl = 'http://127.0.0.1:8000';
+  private apiUrl = environment.apiEndpoint;
 
   constructor(private http: HttpClient, private authService: AuthService) {
     this.authService.currentUser.subscribe(user => {
@@ -92,7 +93,7 @@ export class CourseService {
 
   async fetchMaterials(semester: string, courseAndSection: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.http.get<{materials: Material[]}>(`http://127.0.0.1:8000/api/materials/get-materials-by-class-id/${semester}/${courseAndSection}/`).subscribe({
+      this.http.get<{materials: Material[]}>(`${environment.apiEndpoint}/api/materials/get-materials-by-class-id/${semester}/${courseAndSection}/`).subscribe({
         next: (materials) => {
           this.materialsSource.next(materials.materials)
           resolve();

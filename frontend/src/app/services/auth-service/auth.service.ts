@@ -5,6 +5,7 @@ import { BehaviorSubject, Observable, of } from 'rxjs';
 import { CookieService } from 'ngx-cookie-service';
 import { Router } from '@angular/router';
 import { User } from '../../types/usertype';
+import { environment } from '../../../environment/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -21,12 +22,12 @@ export class AuthService {
 
   login() {
     this.cookieService.set('userType', "instructor" );
-    window.location.href = 'http://127.0.0.1:8000/accounts/login';
+    window.location.href = `${environment.apiEndpoint}/accounts/login`
   }
 
     checkSessionStatus(): Observable<User | null> {
 
-    return this.http.get<User>('http://127.0.0.1:8000/api/users/is-authenticated/', { withCredentials: true }).pipe(
+    return this.http.get<User>(`${environment.apiEndpoint}/api/users/is-authenticated/`, { withCredentials: true }).pipe(
       tap((response: User) => {
         this.currentUserSubject.next(response);
       }),
@@ -40,7 +41,7 @@ export class AuthService {
   async logout() {
     try {
 
-      await this.http.get('http://127.0.0.1:8000/api/users/logout/', { 
+      await this.http.get(`${environment.apiEndpoint}/api/users/logout/`, { 
         withCredentials: true 
       }).toPromise();
       

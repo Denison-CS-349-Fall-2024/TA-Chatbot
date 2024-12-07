@@ -87,9 +87,6 @@ def delete_embeddings(index, class_id, material_name):
     
     if vector_ids:
         index.delete(ids=vector_ids)
-        print(f"Deleted {len(vector_ids)} vectors")
-    else:
-        print("No vectors found with the given prefix")
 
 def upload_embeddings(index, chunks, embeddings, class_id, material_name):
     vectors = [
@@ -104,9 +101,7 @@ def upload_embeddings(index, chunks, embeddings, class_id, material_name):
         }
         for i, (embedding, chunk) in enumerate(zip(embeddings, chunks))
     ]
-    print("about to insert")
     index.upsert(vectors)
-    print("inserted successfully")
 
 def parse_course_string(course_str):
 
@@ -150,8 +145,6 @@ def post_material(request):
             embeddings = embed_chunks(chunks)
 
             index = initialize_index(index_name, INDEX_DIMENSION)
-
-            print(material_name, material_type, course)
 
             upload_embeddings(index, chunks, embeddings, class_id=course_identififer, material_name=material_name)
             material = CourseMaterial.objects.create_material(title=material_name, category=material_type, course=course, file_type=file_type, size=file_size)
@@ -205,7 +198,6 @@ def get_materials_by_class_id(request, semester, classId):
     
     if request.method == "GET":
         try:
-            print(semester, classId)
             department, courseNumber, section = parse_course_string(classId)
             course = Course.objects.get_course_by_course_identifier(department, courseNumber, section)
             # materials = CourseMaterial.get_materials_by_course_id(course.id)

@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
+import { environment } from '../../../environment/environment';
 
 export type Message = {
   isSentByUser: boolean,
@@ -27,7 +28,7 @@ export class ChatService {
     this.messagesSource.next([...this.messagesSource.getValue(), newMessage]);
 
     return new Promise((resolve, reject) => {
-      this.http.post<{response: string}>("http://127.0.0.1:8000/api/chat/query/", {class_id: courseAndSection, query: newMessage.content}).subscribe((res) => {
+      this.http.post<{response: string}>(`${environment.apiEndpoint}/api/chat/query/`, {class_id: courseAndSection, query: newMessage.content}).subscribe((res) => {
         this.messagesSource.next([...this.messagesSource.getValue(), {content: res.response, isSentByUser: false}])
         resolve();
       }, (error) => {
