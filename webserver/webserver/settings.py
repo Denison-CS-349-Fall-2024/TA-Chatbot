@@ -51,9 +51,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'user_management',
-    'class_management',        # Manages classes and pins
-    'chatbot_management',      # Handles chatbot interactions
-    'material_management',     # Manages uploaded materials
+    'class_management', # Manages classes and pins
+    'chatbot_management', # Handles chatbot interactions
+    'material_management', # Manages uploaded materials
+    'student_management', # Manages student class enrollments
     "corsheaders",
     
     # For authentication:

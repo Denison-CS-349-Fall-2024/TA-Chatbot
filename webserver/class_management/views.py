@@ -150,3 +150,4 @@ def courses_by_professor(request, professor_id):
         return JsonResponse({'courses': courses_list}, status=200)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
+    
