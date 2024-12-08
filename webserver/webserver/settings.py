@@ -209,30 +209,11 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1",
     "http://127.0.0.1:80",
     "http://127.0.0.1:4200",
+
     "http://ta-chat.website",
     "http://www.ta-chat.website",
 ]
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_METHODS = [
-    'DELETE',
-    'GET',
-    'OPTIONS',
-    'PATCH',
-    'POST',
-    'PUT',
-]
-
-CORS_ALLOW_HEADERS = [
-    'accept',
-    'accept-encoding',
-    'authorization',
-    'content-type',
-    'dnt',
-    'origin',
-    'user-agent',
-    'x-csrftoken',
-    'x-requested-with',
-]
 
 LOGGING = {
     'version': 1,
@@ -251,14 +232,11 @@ SITE_URL = env('SITE_URL', default='http://localhost')
 FRONTEND_URL = env('FRONTEND_URL', default='http://localhost')
 
 LOGIN_REDIRECT_URL = FRONTEND_URL
-CORS_ALLOWED_ORIGINS = [
-    FRONTEND_URL,
-    SITE_URL,
-    "http://www.ta-chat.website",
-]
+
 CSRF_TRUSTED_ORIGINS = [
-    FRONTEND_URL,
-    SITE_URL,
-    "http://www.ta-chat.website"
+    "http://localhost",
+    "http://127.0.0.1",
+    "http://ta-chat.website",
+    "http://www.ta-chat.website",
 ]
 
