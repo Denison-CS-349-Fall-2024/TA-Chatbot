@@ -1,3 +1,71 @@
+# services:
+
+#   webserver:
+#     container_name: webserver
+#     build: ./webserver
+#     ports:
+#       - "8000:8000"
+#     volumes:
+#       - ./webserver:/app/webserver
+#     environment:
+#       - DEBUG=False
+#       - ALLOWED_HOSTS=127.0.0.1,localhost
+#       - SITE_URL=${SITE_URL}
+#       - FRONTEND_URL=${FRONTEND_URL}
+#     depends_on:
+#         - db
+#     networks:
+#       - app-network
+
+#   frontend:
+#     container_name: frontend
+#     build:
+#       context: ./frontend/
+#       dockerfile: Dockerfile
+#     ports:
+#       - "4200:4200"
+#     networks:
+#       - app-network
+#     environment:
+#       - API_URL=${API_ENDPOINT}
+
+#   db:
+#     container_name: db
+#     image: postgres
+#     restart: always
+#     environment:
+#       POSTGRES_DB: ${POSTGRES_DB}
+#       POSTGRES_USER: ${POSTGRES_USER}    
+#       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+#     volumes:
+#       - pgdata:/var/lib/postgresql/data 
+#     ports:
+#       - "5432:5432"
+#     networks:
+#       - app-network
+
+#   nginx:
+#     container_name: nginx
+#     image: nginx:latest
+#     ports:
+#       - "80:80"
+#     volumes:
+#       - ./nginx:/etc/nginx/conf.d
+#     depends_on:
+#       - frontend
+#       - webserver
+#     networks:
+#       - app-network
+
+# volumes:
+#   pgdata:
+
+# networks:
+#   app-network:
+#     driver: bridge
+
+
+
 services:
 
   webserver:
@@ -14,8 +82,6 @@ services:
       - FRONTEND_URL=${FRONTEND_URL}
     depends_on:
         - db
-    networks:
-      - app-network
 
   frontend:
     container_name: frontend
@@ -24,8 +90,6 @@ services:
       dockerfile: Dockerfile
     ports:
       - "4200:4200"
-    networks:
-      - app-network
     environment:
       - API_URL=${API_ENDPOINT}
 
@@ -41,25 +105,3 @@ services:
       - pgdata:/var/lib/postgresql/data 
     ports:
       - "5432:5432"
-    networks:
-      - app-network
-
-  nginx:
-    container_name: nginx
-    image: nginx:latest
-    ports:
-      - "80:80"
-    volumes:
-      - ./nginx:/etc/nginx/conf.d
-    depends_on:
-      - frontend
-      - webserver
-    networks:
-      - app-network
-
-volumes:
-  pgdata:
-
-networks:
-  app-network:
-    driver: bridge
