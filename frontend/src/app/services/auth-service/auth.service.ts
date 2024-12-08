@@ -32,9 +32,7 @@ export class AuthService {
         this.currentUserSubject.next(response);
       }),
       catchError((error) => {
-        if (error.status === 401) {
           this.login();
-        }
         return of(null);
       })
     );
