@@ -31,8 +31,10 @@ export class AuthService {
       tap((response: User) => {
         this.currentUserSubject.next(response);
       }),
-      catchError(() => {
-        this.login();
+      catchError((error) => {
+        if (error.status === 401) {
+          this.login();
+        }
         return of(null);
       })
     );
