@@ -24,7 +24,7 @@ pc = Pinecone(api_key=PINECONE_API_KEY)
 index_name = "course-embeddings"  # Your Pinecone index name
 
 # Function to perform similarity search using Pinecone
-def search_embeddings(index, query_embedding, class_id, top_k=3):
+def search_embeddings(index, query_embedding, class_id, top_k=10):
     # Construct metadata filters for class_id and material_type
     query_filter = {
         'class_id': class_id,
@@ -38,17 +38,40 @@ def search_embeddings(index, query_embedding, class_id, top_k=3):
     )
     return results
 
+def extract_keywords(query):
+    """
+    Use GPT to extract keywords from a query.
+    Args:
+        query (str): The user query.
+    Returns:
+        list: List of extracted keywords.
+    """
+    completion = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant that extracts key terms from user questions. Identify the most relevant words or phrases that capture the query's intent, and add additional keywords that you think might suit the query better. Return the keywords as a space-separated list."},
+            {"role": "user", "content": f"Extract keywords from this query: {query}"}
+        ],
+        temperature=0.3  # Lower temperature for consistent results
+    )
+    keywords = completion.choices[0].message.content.strip()
+    print(keywords)
+    return keywords
+
+
 # Function to process the query and get the response
-def process_query_and_generate_response(query, class_id, top_k=20):
+def process_query_and_generate_response(query, class_id, top_k=10):
 
     # Create the query embedding using SentenceTransformer
     model = SentenceTransformer('all-MiniLM-L6-v2')
-    query_embedding = model.encode(query, convert_to_tensor=True)
+    keyword_query = extract_keywords(query)
+    query_embedding = model.encode(keyword_query, convert_to_tensor=True)
 
     # Initialize Pinecone index and perform similarity search
     index = pc.Index(index_name)
     search_results = search_embeddings(index, query_embedding, class_id, top_k)
-
+    print('reaching search results')
+    print(search_results)
     # Gather the most relevant results
     results_text = ""
     for match in search_results['matches']:
@@ -57,25 +80,30 @@ def process_query_and_generate_response(query, class_id, top_k=20):
 
     # Generate a response using GPT-4
     completion = client.chat.completions.create(
-        model="gpt-4",  # Ensure you're using the correct model name
-        messages=[
-            {"role": "system", "content": "You are a helpful assistant, answering class-related questions. Treat instructor as professor and vice-versa. Be smart and infer some stuff."},
-            {
-                "role": "user",
-                "content": f"""
+    model="gpt-4o-mini",  # Ensure you're using the correct model name
+    messages=[
+        {"role": "system", "content": "You are a knowledgeable and helpful assistant who answers students' questions about specific classes at Denison University. You have full knowledge of course materials and must answer questions authoritatively without referencing the source of the information explicitly."},
+        {
+            "role": "user",
+            "content": f"""
                 A student asked the following question:
 
                 Question: {query}
 
                 ---
-                Only use the provided text to answer the question. The responses are ordered by decreasing cosine similarity with the query. Analyze the responses and construct an answer that best addresses the question.
+                The following are the most relevant materials extracted for the query. Use these to construct your answer, but do not reveal their existence or suggest uncertainty:
                 ---
                 {results_text}
-                """
-            }
-        ],
-        temperature=0.6
-    )
+
+                Remember: 
+                - Answer only questions directly related to the class content.
+                - If the question is unrelated to the class, decline politely and suggest the student contact their instructor or relevant department for clarification.
+            """
+        }
+    ],
+    temperature=0.6
+)
+
     # Extract the response from GPT-4
     response_content = completion.choices[0].message.content
     return response_content  # Return the raw content for further processing

@@ -141,7 +141,7 @@ def post_material(request):
                 text += page.extract_text()
 
             # Continue with the existing processing
-            chunks = split_text_into_chunks(text, chunk_size=250, chunk_overlap=50)
+            chunks = split_text_into_chunks(text, chunk_size=512, chunk_overlap=100)
             embeddings = embed_chunks(chunks)
 
             index = initialize_index(index_name, INDEX_DIMENSION)
