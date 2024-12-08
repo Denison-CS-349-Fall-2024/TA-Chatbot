@@ -27,7 +27,7 @@ export class AuthService {
 
     checkSessionStatus(): Observable<User | null> {
 
-    return this.http.get<User>(`${environment.apiEndpoint}/api/users/is-authenticated/`, { withCredentials: true }).pipe(
+    return this.http.get<User>(`${environment.apiEndpoint}/users/is-authenticated/`, { withCredentials: true }).pipe(
       tap((response: User) => {
         this.currentUserSubject.next(response);
       }),
@@ -41,7 +41,7 @@ export class AuthService {
   async logout() {
     try {
 
-      await this.http.get(`${environment.apiEndpoint}/api/users/logout/`, { 
+      await this.http.get(`${environment.apiEndpoint}/users/logout/`, { 
         withCredentials: true 
       }).toPromise();
       

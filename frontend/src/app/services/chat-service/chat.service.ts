@@ -28,7 +28,7 @@ export class ChatService {
     this.messagesSource.next([...this.messagesSource.getValue(), newMessage]);
 
     return new Promise((resolve, reject) => {
-      this.http.post<{response: string}>(`${environment.apiEndpoint}/api/chat/query/`, {class_id: courseAndSection, query: newMessage.content}).subscribe((res) => {
+      this.http.post<{response: string}>(`${environment.apiEndpoint}/chat/query/`, {class_id: courseAndSection, query: newMessage.content}).subscribe((res) => {
         this.messagesSource.next([...this.messagesSource.getValue(), {content: res.response, isSentByUser: false}])
         resolve();
       }, (error) => {

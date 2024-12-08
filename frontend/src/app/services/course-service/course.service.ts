@@ -79,7 +79,7 @@ export class CourseService {
   async deleteMaterial(material_id: string) {
     try {
 
-      this.http.delete(`${this.apiUrl}/api/materials/delete/${material_id}/`).subscribe({
+      this.http.delete(`${this.apiUrl}/materials/delete/${material_id}/`).subscribe({
         next: (response) => {
           this.materialsSource.next(this.materialsSource.getValue().filter(material => material.id !== material_id));
         },
@@ -93,7 +93,7 @@ export class CourseService {
 
   async fetchMaterials(semester: string, courseAndSection: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.http.get<{materials: Material[]}>(`${environment.apiEndpoint}/api/materials/get-materials-by-class-id/${semester}/${courseAndSection}/`).subscribe({
+      this.http.get<{materials: Material[]}>(`${environment.apiEndpoint}/materials/get-materials-by-class-id/${semester}/${courseAndSection}/`).subscribe({
         next: (materials) => {
           this.materialsSource.next(materials.materials)
           resolve();
@@ -116,7 +116,7 @@ export class CourseService {
     formData.append('class_id', course_id);
     formData.append('enableAI', 'false');
   
-    return this.http.post(`${this.apiUrl}/api/materials/upload/`, formData).pipe(
+    return this.http.post(`${this.apiUrl}/materials/upload/`, formData).pipe(
       tap(() => {
         this.fetchMaterials(semester, course_id);
       }),
