@@ -86,6 +86,7 @@ CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:80",
     "http://127.0.0.1:4200",
     "http://ta-chat.website",
+    "http://www.ta-chat.website",
     "http://ta-chat.website:4200"
 ]
 
@@ -209,9 +210,29 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:80",
     "http://127.0.0.1:4200",
     "http://ta-chat.website",
-    "http://ta-chat.website:4200"
+    "http://www.ta-chat.website",
 ]
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
 
 LOGGING = {
     'version': 1,
