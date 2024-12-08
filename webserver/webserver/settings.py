@@ -85,6 +85,8 @@ CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1",
     "http://127.0.0.1:80",
     "http://127.0.0.1:4200",
+    "http://ta-chat.website",
+    "http://ta-chat.website:4200"
 ]
 
 ROOT_URLCONF = 'webserver.urls'
@@ -194,7 +196,7 @@ ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USER_MODEL_USERNAME_FIELD = 'email'
 
-LOGIN_REDIRECT_URL = "http://localhost"  # Change to a simple page that exists
+# LOGIN_REDIRECT_URL = "http://localhost"  # Change to a simple page that exists
 # LOGIN_REDIRECT_URL = "http://127.0.0.1:4200" 
 
 # LOGIN_REDIRECT_URL = 'get-csrf-token/'
@@ -206,6 +208,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1",
     "http://127.0.0.1:80",
     "http://127.0.0.1:4200",
+    "http://ta-chat.website",
+    "http://ta-chat.website:4200"
 ]
 CORS_ALLOW_CREDENTIALS = True
 
@@ -229,9 +233,11 @@ LOGIN_REDIRECT_URL = FRONTEND_URL
 CORS_ALLOWED_ORIGINS = [
     FRONTEND_URL,
     SITE_URL,
+    "http://www.ta-chat.website",
 ]
 CSRF_TRUSTED_ORIGINS = [
     FRONTEND_URL,
     SITE_URL,
+    "http://www.ta-chat.website"
 ]
 

@@ -45,6 +45,7 @@ services:
       - app-network
 
   nginx:
+    container_name: nginx
     image: nginx:latest
     ports:
       - "80:80"
