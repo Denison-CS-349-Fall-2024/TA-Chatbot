@@ -64,6 +64,17 @@ def get_enrollments_by_student(request, student_id):
 
     return JsonResponse({"enrollments": enrollment_data})
 
+def get_enrollments_by_course(request, course_id):
+    course = get_object_or_404(Course, id=course_id)
+    enrollments = StudentEnrollments.objects.get_enrollments_by_course(course)
+    enrollment_data = [
+        {
+            "student_name":enrollment.student.name
+        }
+        for enrollment in enrollments
+    ]
+    JsonResponse({"enrollments": enrollment_data})
+
 
 def list_enrollments(request):
     """
