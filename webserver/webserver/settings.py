@@ -87,7 +87,9 @@ CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:4200",
     "http://ta-chat.website",
     "http://www.ta-chat.website",
-    "http://ta-chat.website:4200"
+    "http://ta-chat.website:4200",
+    "https://www.ta-chat.website",
+    "https://ta-chat.website:4200"
 ]
 
 ROOT_URLCONF = 'webserver.urls'
@@ -212,6 +214,7 @@ CORS_ALLOWED_ORIGINS = [
 
     "http://ta-chat.website",
     "http://www.ta-chat.website",
+    "https://www.ta-chat.website",
 ]
 CORS_ALLOW_CREDENTIALS = True
 
@@ -238,5 +241,6 @@ CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1",
     "http://ta-chat.website",
     "http://www.ta-chat.website",
+    "https://www.ta-chat.website",
 ]
 

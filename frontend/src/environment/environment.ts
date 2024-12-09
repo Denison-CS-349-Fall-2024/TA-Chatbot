@@ -5,7 +5,7 @@ export const environment = {
     // apiEndpoint: "/api"
 
     // apiEndpoint: "http://localhost/api"
-    apiEndpoint: "http://ta-chat.website/api"
+    apiEndpoint: "https://www.ta-chat.website/api"
 
     // apiEndpoint: process.env['API_URL'] || '/api'
 
