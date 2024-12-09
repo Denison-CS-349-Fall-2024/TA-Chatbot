@@ -37,6 +37,8 @@ def load_pdf(file_path):
         text = ''
         for page in reader.pages:
             text += page.extract_text()
+        text = re.sub(r'\s+', ' ', text)  # Normalize whitespace
+        text = re.sub(r'[^\w\s.,;!?]', '', text)
     return text
 
 # Split text into chunks
@@ -141,7 +143,7 @@ def post_material(request):
                 text += page.extract_text()
 
             # Continue with the existing processing
-            chunks = split_text_into_chunks(text, chunk_size=250, chunk_overlap=50)
+            chunks = split_text_into_chunks(text, chunk_size=1000, chunk_overlap=200)
             embeddings = embed_chunks(chunks)
 
             index = initialize_index(index_name, INDEX_DIMENSION)
