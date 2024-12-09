@@ -89,7 +89,7 @@ services:
       context: ./frontend/
       dockerfile: Dockerfile
     ports:
-      - "4200:4200"
+      - "80:80"
     environment:
       - API_URL=${API_ENDPOINT}
 
