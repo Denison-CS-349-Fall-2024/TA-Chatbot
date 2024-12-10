@@ -3,6 +3,7 @@ import { Component, Input, ViewChild, ElementRef, AfterViewChecked } from '@angu
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { ChatService, Message } from '../../services/chat-service/chat.service';
+import { formatSemester } from '../../utils/format';
 
 interface ChatHistory {
   date: string;
@@ -30,7 +31,7 @@ interface ChatHistory {
           <h2 class="text-xl font-bold dark:text-white">
             {{ courseAndSection }} Assistant
           </h2>
-          <p class="text-sm text-gray-500 dark:text-gray-400">{{ semester }}</p>
+          <p class="text-sm text-gray-500 dark:text-gray-400">{{ formatSemester(semester) }}</p>
         </div>
       </div>
       
@@ -217,5 +218,9 @@ export class ChatComponent implements AfterViewChecked {
   handleFileUpload(event: any) {
     const file = event.target.files[0];
     // Implement file upload logic
+  }
+
+  formatSemester(semester: string): string {
+    return formatSemester(semester);
   }
 }

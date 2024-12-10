@@ -28,11 +28,17 @@ class StudentEnrollmentsManager(models.Manager):
         except StudentEnrollments.DoesNotExist:
             return ValueError("Could not find a course")
         
+    def get_enrollments_by_student_and_course(self, student_id, course_id):
+        try:
+            enrollments = self.filter(student=student_id, course=course_id)
+            return enrollments.first()
+        except StudentEnrollments.DoesNotExist:
+            return None
 
 class StudentEnrollments(models.Model):
     student = models.ForeignKey(User,on_delete=models.CASCADE, related_name='enrollments')
     course = models.ForeignKey(Course, on_delete=models.CASCADE,related_name='classes')
 
-    object = StudentEnrollmentsManager()
+    objects = StudentEnrollmentsManager()
     def __str__(self):
         return f"{self.student} enrolled in {self.course}"

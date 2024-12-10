@@ -13,6 +13,7 @@ import { Material } from '../../types/coursetypes';
 import { Subscription } from 'rxjs';
 import { ConfirmationModalComponent } from '../../components/confirmation-modal/confirmation-modal.component';
 import { ToastComponent } from '../../components/toast/toast.component';
+import { formatSemester } from '../../utils/format';
 
 interface Student {
   id: string;
@@ -319,5 +320,9 @@ export class ClassroomComponent  implements OnInit  {
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  }
+
+  formatSemester(semester: string): string {
+    return formatSemester(semester);
   }
 }

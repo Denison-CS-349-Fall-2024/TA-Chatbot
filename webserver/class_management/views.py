@@ -83,6 +83,35 @@ def create_course(request):
     return JsonResponse({'error': 'Invalid HTTP method'}, status=405)
 
 @csrf_exempt
+def all_courses(request):
+    if request.method == 'GET':
+        courses = Course.objects.all()
+        
+        # Convert QuerySet to list of dictionaries
+        courses_data = []
+
+        for course in courses:
+            professor = get_object_or_404(User, id=course.professor)
+            courses_data.append({
+                "id": str(course.id),
+                "name": course.name,
+                "courseTitle": course.name,
+                "department": course.department,
+                "courseNumber": course.course_number,
+                "section": course.section,
+                "semester": course.semester,
+                "credits": str(course.credits),
+                "professorFirstName": professor.first_name,
+                "professorLastName": professor.last_name,
+                "pin": course.pin,
+                "isActive": course.is_active
+            })
+        
+        return JsonResponse({'courses': courses_data}, status=200)
+    
+    return JsonResponse({'error': 'Invalid HTTP method'}, status=405)
+
+@csrf_exempt
 def update_course(request):
     if request.method == 'PUT':
         try:
@@ -109,7 +138,6 @@ def update_course(request):
                 course.credits = course_payload.get('credits')
 
             course.save()
-
             professor = get_object_or_404(User, id=course.professor)
 
             return JsonResponse({'message': 'Course updated successfully', 'course': {
@@ -123,8 +151,9 @@ def update_course(request):
                     'pin': course.pin,
                     'isActive': course.is_active,
                     'professorFirstName': professor.first_name,
-                    'professorLastName': professor.last_name
-                                    }}, status=200) 
+                    'professorLastName': professor.last_name,
+                    'lastUpdated': course.last_updated.isoformat()
+                }}, status=200)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
     return JsonResponse({'error': 'Invalid HTTP method'}, status=405)

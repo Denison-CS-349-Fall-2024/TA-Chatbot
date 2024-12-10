@@ -15,6 +15,7 @@ import { ViewPreferenceService } from '../../services/view-preference/view-prefe
 import { ConfirmationArchiveModalComponent } from '../confirmation-archive-modal/confirmation-archive-modal.component';
 import { ViewService } from '../../services/view-service/view.service';
 import { StudentDashboardComponent } from '../student-dashboard/student-dashboard.component';
+import { formatSemester } from '../../utils/format';
 
 @Component({
   selector: 'app-instructor',
@@ -238,9 +239,7 @@ export class InstructorComponent implements OnInit, OnDestroy {
   }
 
   formatSemester(semester: string): string {
-    const season = semester.slice(0, -4);
-    const year = semester.slice(-4);
-    return `${season.charAt(0).toUpperCase()}${season.slice(1)} ${year}`;
+    return formatSemester(semester);
   }
 
   getSemesterColor(semester: string): string {

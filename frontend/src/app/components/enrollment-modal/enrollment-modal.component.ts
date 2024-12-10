@@ -4,6 +4,10 @@ import { FormsModule } from '@angular/forms';
 import { Course } from '../../types/coursetypes';
 import { ToastService } from '../../services/toast-service/toast.service';
 import { ToastComponent } from '../toast/toast.component';
+import { CourseService } from '../../services/course-service/course.service';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environment/environment';
+import { AuthService } from '../../services/auth-service/auth.service';
 
 @Component({
   selector: 'app-enrollment-modal',
@@ -102,37 +106,36 @@ export class EnrollmentModalComponent implements OnInit {
   protected selectedCourse: Course | null = null;
   protected pin = '';
   protected availableCourses: Course[] = [];
+  private currentEnrollments: Course[] = [];
 
-  constructor(protected toastService: ToastService) {}
+  constructor(
+    protected toastService: ToastService,
+    private courseService: CourseService,
+    private authService: AuthService,
+    private http: HttpClient
+  ) {}
 
-  ngOnInit() {
-    // Generate mock data
-    this.availableCourses = this.generateMockCourses();
+  async ngOnInit() {
+    await this.courseService.fetchAllCourses();
+    
+    // Store all active courses first
+    let allActiveCourses: Course[] = [];
+    
+    this.courseService.availableCourses$.subscribe(courses => {
+      allActiveCourses = courses.filter(course => course.isActive);
+      this.filterAvailableCourses(allActiveCourses, this.currentEnrollments);
+    });
+
+    this.courseService.courses$.subscribe(enrollments => {
+      this.currentEnrollments = enrollments;
+      this.filterAvailableCourses(allActiveCourses, enrollments);
+    });
   }
 
-  generateMockCourses(): Course[] {
-    const departments = ['CS', 'MATH', 'PHYS', 'CHEM', 'BIO'];
-    const professors = ['Dr. Smith', 'Dr. Johnson', 'Dr. Williams', 'Dr. Brown', 'Dr. Jones'];
-    const courses: Course[] = [];
-
-    for (let i = 0; i < 20; i++) {
-      const dept = departments[Math.floor(Math.random() * departments.length)];
-      const courseNum = "" + Math.floor(Math.random() * 500) + 100;
-      courses.push({
-        id: `course-${i}`,
-        courseTitle: `${dept} ${courseNum}: Introduction to ${dept}`,
-        department: dept,
-        courseNumber: courseNum,
-        section: `0${Math.floor(Math.random() * 5) + 1}`,
-        semester: Math.random() > 0.5 ? 'fall2024' : 'spring2024',
-        credits: "" + Math.floor(Math.random() * 3) + 2,
-        professorFirstName: professors[Math.floor(Math.random() * professors.length)].split(' ')[0],
-        professorLastName: professors[Math.floor(Math.random() * professors.length)].split(' ')[1],
-        pin: '1234', // Mock pin for testing
-        isActive: true
-      });
-    }
-    return courses;
+  private filterAvailableCourses(allCourses: Course[], enrollments: Course[]) {
+    this.availableCourses = allCourses.filter(course => 
+      !enrollments.some(enrollment => enrollment.id === course.id)
+    );
   }
 
   getFilteredCourses() {
@@ -155,16 +158,38 @@ export class EnrollmentModalComponent implements OnInit {
     this.pin = '';
   }
 
-  enrollInCourse() {
+  async enrollInCourse() {
     if (!this.selectedCourse || !this.pin) return;
 
     if (this.pin === this.selectedCourse.pin) {
-      this.enrolled.emit(this.selectedCourse);
-      this.close();
+      try {
+        const studentId = this.authService.getId();
+        
+        await this.courseService.enrollStudent(studentId!, this.selectedCourse.id);
+
+        this.enrolled.emit(this.selectedCourse);
+        
+        this.toastService.show(
+          'success',
+          'Enrollment Successful',
+          `You have been enrolled in ${this.selectedCourse.courseTitle}`
+        );
+
+        this.close();
+      } catch (error) {
+        this.toastService.show(
+          'error',
+          'Enrollment Failed',
+          'There was an error enrolling in the course. Please try again.'
+        );
+        console.error('Error enrolling in course:', error);
+      }
     } else {
-
-      this.toastService.show('error', 'Invalid pin', 'The pin you entered is incorrect.');
-
+      this.toastService.show(
+        'error',
+        'Invalid Pin',
+        'The pin you entered is incorrect.'
+      );
     }
   }
 

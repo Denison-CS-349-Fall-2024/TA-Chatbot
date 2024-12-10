@@ -14,25 +14,31 @@ export class CourseService {
   private materialsSource = new BehaviorSubject<Material[]>([]);
   private archivedCoursesSource = new BehaviorSubject<Course[]>([]);
   private coursesSource = new BehaviorSubject<Course[]>([]);
+  private availableCoursesSource = new BehaviorSubject<Course[]>([]);
 
   public materials$ = this.materialsSource.asObservable();
   public courses$ = this.coursesSource.asObservable();
   public archivedCourses$ = this.archivedCoursesSource.asObservable();
+  public availableCourses$ = this.availableCoursesSource.asObservable();
 
   private apiUrl = environment.apiEndpoint;
 
   constructor(private http: HttpClient, private authService: AuthService) {
-    this.authService.currentUser.subscribe(user => {
-      if (this.authService.isProfessor()) {
-        this.getInstructorCourses(this.authService.getId()!);
-      }else{
-        //TODO: Fetch courses for the students.
+    // Wait for authentication check to complete before fetching courses
+    this.authService.checkSessionStatus().subscribe(user => {
+      if (user) {  // Only proceed if we have a user
+        if (this.authService.isProfessor()) {
+          this.getInstructorCourses(this.authService.getId()!);
+        } else {
+          this.getStudentCourses(this.authService.getId()!);
+        }
       }
     });
-   }   
+  }   
 
   async addCourse(name: string, section: string, department: string, course_number: string, credits: string) {
     try {
+
       let professor_id = this.authService.getId()!;
       
       return new Promise((resolve, reject) => {
@@ -62,6 +68,15 @@ export class CourseService {
     }
   }
 
+  async fetchAllCourses() {
+    this.http.get<{courses: Course[]}>(`${this.apiUrl}/class-management/courses/all/`).subscribe({
+      next: (response: {courses: Course[]}) => {
+        this.availableCoursesSource.next(response.courses);
+      },
+      error: (error) => console.error('Error fetching courses:', error),
+    });
+  }
+
   async getInstructorCourses(id: string) {
     this.http.get<{courses: Course[]}>(`${this.apiUrl}/class-management/courses/professor/${id}/`).subscribe({
       next: (response: {courses: Course[]}) => {
@@ -73,7 +88,13 @@ export class CourseService {
   }
 
   async getStudentCourses(id: string) {
-    //TODO: Fetch courses for the students.
+    this.http.get<{enrollments: Course[]}>(`${this.apiUrl}/student-management/enrollments/student/${id}/`).subscribe({
+      next: (response: {enrollments: Course[]}) => {
+        this.archivedCoursesSource.next(response.enrollments.filter(course => !course.isActive))
+        this.coursesSource.next(response.enrollments.filter(course => course.isActive))
+      }, 
+      error: (error) => console.error('Error fetching courses:', error),
+    });
   }
 
   async deleteMaterial(material_id: string) {
@@ -89,7 +110,6 @@ export class CourseService {
       console.error('Error deleting material:', error);
     }
   }
-
 
   async fetchMaterials(semester: string, courseAndSection: string): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -145,8 +165,13 @@ export class CourseService {
     });
   }
 
-  async fetchCourses() {
-    // Fetch both active and archived courses
-    // Update the courses$ observable accordingly
+  async enrollStudent(studentId: string, courseId: string) {
+
+    this.http.post(`${this.apiUrl}/student-management/enrollments/create/`, {student_id: studentId, course_id: courseId}).subscribe({
+      next: (response) => {
+        this.getStudentCourses(studentId);
+      },
+      error: (error) => console.error('Error enrolling student:', error),
+    });
   }
 }

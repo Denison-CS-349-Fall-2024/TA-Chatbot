@@ -40,6 +40,7 @@ class Course(models.Model):
     professor = models.CharField(max_length=255)
     is_active = models.BooleanField(default=True)
     credits = models.IntegerField(default=4)
+    last_updated = models.DateTimeField(auto_now=True)
     objects = CourseManager()
     def __str__(self):
         return self.name

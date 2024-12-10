@@ -9,6 +9,7 @@ import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { EnrollmentModalComponent } from '../enrollment-modal/enrollment-modal.component';
 import { ToastService } from '../../services/toast-service/toast.service';
+import { formatSemester } from '../../utils/format';
 
 @Component({
   selector: 'app-student-dashboard',
@@ -57,9 +58,7 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
   }
 
   formatSemester(semester: string): string {
-    const season = semester.slice(0, -4);
-    const year = semester.slice(-4);
-    return `${season.charAt(0).toUpperCase()}${season.slice(1)} ${year}`;
+    return formatSemester(semester);
   }
 
   getSemesterColor(semester: string): string {

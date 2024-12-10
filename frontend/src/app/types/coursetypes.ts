@@ -18,5 +18,4 @@ export interface Material {
   type: 'pdf' | 'docx'
   size: number
   uploadDate: Date,
-  
 }
