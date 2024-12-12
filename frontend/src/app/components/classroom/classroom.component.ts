@@ -9,7 +9,7 @@ import { AddMaterialModalComponent } from '../../components/add-material-modal/a
 import { DomSanitizer } from '@angular/platform-browser';
 import { NgxDocViewerModule } from 'ngx-doc-viewer';
 import { SafePipe } from '../../pipes/safe.pipe';
-import { Material } from '../../types/coursetypes';
+import { Course, Material } from '../../types/coursetypes';
 import { Subscription } from 'rxjs';
 import { ConfirmationModalComponent } from '../../components/confirmation-modal/confirmation-modal.component';
 import { ToastComponent } from '../../components/toast/toast.component';
@@ -19,8 +19,8 @@ interface Student {
   id: string;
   name: string;
   email: string;
-  status: 'Enrolled' | 'Not Enrolled' | 'Waitlisted';
-  lastActive: Date;
+  status: string;
+  lastActive: Date | null;
 }
 
 type TabType = 'materials' | 'students' | 'settings';
@@ -28,8 +28,17 @@ type TabType = 'materials' | 'students' | 'settings';
 interface CourseSettings {
   name: string;
   section: string;
+  department: string;
+  courseNumber: string;
+  credits: string;
   isVisible: boolean;
   allowStudentDiscussions: boolean;
+  aiResponseTime: number;
+  maxQuestionsPerStudent: number;
+  requireApproval: boolean;
+  notifyTAOnQuestions: boolean;
+  aiPersonality: 'professional' | 'friendly' | 'socratic';
+  defaultLanguage: 'en' | 'es' | 'fr';
 }
 
 @Component({
@@ -58,15 +67,24 @@ export class ClassroomComponent  implements OnInit  {
   protected isLoading = true;
   protected selectedTab: TabType = 'materials';
 
-  protected lastUpdated: Date = new Date();
   protected showSettingsMenu = false;
   protected courseMaterials: Material[] = [];
-  protected courseSettings: CourseSettings = {
-    name: '',
-    section: '',
-    isVisible: true,
-    allowStudentDiscussions: true
-  };
+  protected courseSettings!: Course;
+  // protected courseSettings: CourseSettings = {
+  //   name: '',
+  //   section: '',
+  //   department: '',
+  //   courseNumber: '',
+  //   credits: '',
+  //   isVisible: true,
+  //   allowStudentDiscussions: true,
+  //   aiResponseTime: 30,
+  //   maxQuestionsPerStudent: 50,
+  //   requireApproval: false,
+  //   notifyTAOnQuestions: true,
+  //   aiPersonality: 'professional',
+  //   defaultLanguage: 'en'
+  // };
 
   protected isAddMaterialModalOpen = false;
   protected selectedMaterial: Material | null = null;
@@ -74,6 +92,24 @@ export class ClassroomComponent  implements OnInit  {
   protected materialSubscription!: Subscription;
 
   protected materialToDelete: Material | null = null;
+
+  protected courseDetails: Course | null = null;
+  protected lastUpdated: string | null = null;
+
+  protected originalSettings: Course | null = null;
+  protected hasUnsavedChanges = false;
+
+  protected aiPersonalityOptions = [
+    { value: 'professional', label: 'Professional' },
+    { value: 'friendly', label: 'Friendly' },
+    { value: 'socratic', label: 'Socratic Method' }
+  ];
+
+  protected languageOptions = [
+    { value: 'en', label: 'English' },
+    { value: 'es', label: 'Spanish' },
+    { value: 'fr', label: 'French' }
+  ];
 
   constructor(
     private route: ActivatedRoute,
@@ -84,6 +120,48 @@ export class ClassroomComponent  implements OnInit  {
   async ngOnInit() {
     this.semester = this.route.snapshot.paramMap.get("semester")!;
     this.courseAndSection = this.route.snapshot.paramMap.get("courseAndSection")!;
+    
+    const matches = this.courseAndSection.match(/([a-z]+)(\d+)-(\d+)/i);
+    if (matches) {
+      const [_, department, courseNumber, section] = matches;
+      
+      this.courseService.getCourseDetails(
+        this.semester,
+        department,
+        parseInt(courseNumber),
+        section
+      ).subscribe({
+        next: (response) => {
+          this.courseDetails = response.course;
+          this.lastUpdated = response.course.lastUpdated;
+          
+          this.courseSettings = {
+            id: response.course.id,
+            semester: response.course.semester,
+            professorFirstName: response.course.professorFirstName,
+            professorLastName: response.course.professorLastName,
+            pin: response.course.pin,
+            isActive: response.course.isActive,
+            courseTitle: response.course.courseTitle,
+            section: response.course.section,
+            department: response.course.department,
+            courseNumber: response.course.courseNumber,
+            credits: response.course.credits
+          };
+          
+          this.originalSettings = { ...this.courseSettings };
+          
+          this.students = response.students.map(student => ({
+            ...student,
+            lastActive: student.lastActive ? new Date(student.lastActive) : null
+          }));
+          this.filterStudents();
+        },
+        error: (error) => {
+          this.toastService.show('error', 'Error', 'Failed to load course details');
+        }
+      });
+    }
 
     this.materialSubscription = this.courseService.materials$.subscribe((materials) => {
       this.courseMaterials = materials;
@@ -106,7 +184,6 @@ export class ClassroomComponent  implements OnInit  {
         this.courseService.fetchMaterials(this.semester, this.courseAndSection)
       ]);
       
-      this.lastUpdated = new Date();
       this.toastService.show('success', 'Success', 'Course data loaded successfully');
     } catch (error) {
       this.toastService.show('error', 'Error', 'Failed to load course data');
@@ -136,6 +213,22 @@ export class ClassroomComponent  implements OnInit  {
       .sort((a, b) => {
         const aValue = a[this.studentSortKey];
         const bValue = b[this.studentSortKey];
+
+        // Handle null values in sorting
+        if (aValue === null && bValue === null) return 0;
+        if (aValue === null) return 1;  // null values go to the end
+        if (bValue === null) return -1;
+
+        // Special handling for dates
+        if (this.studentSortKey === 'lastActive') {
+          const aDate = aValue as Date;
+          const bDate = bValue as Date;
+          return this.studentSortDirection === 'asc' 
+            ? aDate.getTime() - bDate.getTime()
+            : bDate.getTime() - aDate.getTime();
+        }
+
+        // Regular string/number comparison
         return this.studentSortDirection === 'asc' 
           ? aValue > bValue ? 1 : -1
           : aValue < bValue ? 1 : -1;
@@ -200,12 +293,43 @@ export class ClassroomComponent  implements OnInit  {
     this.showSettingsMenu = false;
   }
 
-  saveSettings() {
+  checkForChanges() {
+    this.hasUnsavedChanges = this.originalSettings ? Object.keys(this.courseSettings).some(
+      key => this.courseSettings[key as keyof Course] !== this.originalSettings?.[key as keyof Course]
+    ) : false;
+  }
+
+  async saveSettings() {
     try {
-      // Implementation for saving settings
-      this.toastService.show('success', 'Success', 'Settings saved successfully');
+      const courseId = this.courseDetails?.id;
+      if (!courseId) {
+        throw new Error('Course ID not found');
+      }
+
+      const updateData = {
+        id: courseId,
+        courseTitle: this.courseSettings.courseTitle,
+        section: this.courseSettings.section,
+        department: this.courseSettings.department,
+        courseNumber: this.courseSettings.courseNumber,
+        credits: this.courseSettings.credits,
+        isActive: true,
+        // Add any other fields you want to update
+      };
+
+      await this.courseService.updateCourseSettings(updateData);
+      this.originalSettings = { ...this.courseSettings };
+      this.hasUnsavedChanges = false;
+      this.toastService.show('success', 'Success', 'Course settings saved successfully');
     } catch (error) {
       this.toastService.show('error', 'Error', 'Failed to save settings');
+    }
+  }
+
+  resetSettings() {
+    if (this.originalSettings) {
+      this.courseSettings = { ...this.originalSettings };
+      this.hasUnsavedChanges = false;
     }
   }
 
@@ -324,5 +448,49 @@ export class ClassroomComponent  implements OnInit  {
 
   formatSemester(semester: string): string {
     return formatSemester(semester);
+  }
+
+  protected downloadStudentList() {
+    // Only include filtered students in the CSV
+    const csvData = this.filteredStudents.map(student => ({
+      Name: student.name,
+      Email: student.email,
+      Status: student.status,
+      'Last Active': student.lastActive ? new Date(student.lastActive).toLocaleString() : 'Never'
+    }));
+
+    // Convert to CSV
+    const headers = Object.keys(csvData[0]);
+    const csv = [
+      headers.join(','), // Header row
+      ...csvData.map(row => headers.map(header => 
+        // Wrap values in quotes and escape existing quotes
+        `"${String(row[header as keyof typeof row]).replace(/"/g, '""')}"`
+      ).join(','))
+    ].join('\n');
+
+    // Create and download blob
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${this.courseAndSection}_students_${this.semester}.csv`;
+    
+    // Trigger download
+    document.body.appendChild(link);
+    link.click();
+    
+    // Cleanup
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+    
+    this.toastService.show('success', 'Success', 'Student list downloaded successfully');
+  }
+
+  copyPin() {
+    if (this.courseDetails?.pin) {
+      navigator.clipboard.writeText(this.courseDetails.pin);
+      this.toastService.show('success', 'Copied!','Course PIN copied to clipboard');
+    }
   }
 }

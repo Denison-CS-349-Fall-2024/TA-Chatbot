@@ -9,7 +9,8 @@ export interface Course  {
   professorFirstName: string,
   professorLastName: string,
   pin: string,
-  isActive: boolean
+  isActive: boolean,
+  lastUpdated?: string
 }
 
 export interface Material {

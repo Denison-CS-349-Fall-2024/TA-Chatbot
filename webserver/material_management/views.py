@@ -128,13 +128,14 @@ def post_material(request):
             file_name = data.get('fileName', file.name)
             material_type = data.get('materialType', file.name)
             material_name = data.get('materialName', '')
+            material_semester = data.get('semester', '')
             course_identififer = data.get("class_id", "")
             file_size = file.size
             file_type = file.name.split('.')[-1]
 
             parsed_string = parse_course_string(course_identififer)
 
-            course = Course.objects.get_course_by_course_identifier(parsed_string[0], parsed_string[1], parsed_string[2])
+            course = Course.objects.get_course_by_course_identifier(material_semester, parsed_string[0], parsed_string[1], parsed_string[2])
             
             # Directly read the PDF content from the uploaded file
             reader = PdfReader(file)
@@ -201,7 +202,7 @@ def get_materials_by_class_id(request, semester, classId):
     if request.method == "GET":
         try:
             department, courseNumber, section = parse_course_string(classId)
-            course = Course.objects.get_course_by_course_identifier(department, courseNumber, section)
+            course = Course.objects.get_course_by_course_identifier(semester, department, courseNumber, section)
             # materials = CourseMaterial.get_materials_by_course_id(course.id)
             materials = CourseMaterial.objects.get_materials_by_course_id(course.id)
 

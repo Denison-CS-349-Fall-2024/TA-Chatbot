@@ -5,3 +5,12 @@ id: string,
  firstName: string,
  lastName: string
 }
+
+export interface Student {
+    id: string,
+    firstName: string,
+    lastName: string,
+    email: string,
+    status: string,
+    lastActive: string
+}

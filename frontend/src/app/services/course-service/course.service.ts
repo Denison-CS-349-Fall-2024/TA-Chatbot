@@ -174,4 +174,44 @@ export class CourseService {
       error: (error) => console.error('Error enrolling student:', error),
     });
   }
+
+  getCourseDetails(semester: string, department: string, courseNumber: number, section: string) {
+    return this.http.get<{
+      course: {
+        id: string;
+        courseTitle: string;
+        pin: string,
+        section: string;
+        department: string;
+        courseNumber: string;
+        semester: string;
+        credits: string;
+        isActive: boolean;
+        lastUpdated: string;
+        professorFirstName: string;
+        professorLastName: string;
+      },
+      students: {
+        id: string;
+        name: string;
+        email: string;
+        status: string;
+        lastActive: string | null;
+      }[]
+    }>(`${this.apiUrl}/class-management/courses/${semester}/${department}/${courseNumber}/${section}/`);
+  }
+
+  async updateCourseSettings(updateData: any): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.http.put(`${this.apiUrl}/class-management/courses/update/`, updateData).subscribe({
+        next: (response: any) => {
+          resolve();
+        },
+        error: (error) => {
+          console.error('Error updating course settings:', error);
+          reject(error);
+        }
+      });
+    });
+  }
 }
