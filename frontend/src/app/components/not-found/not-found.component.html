@@ -1,1 +1,77 @@
-<p>not-found works!</p>
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center px-4 sm:px-6 lg:px-8">
+  <div class="max-w-lg w-full space-y-8 text-center">
+    <!-- Error Code -->
+    <div class="relative">
+      <h1 class="text-9xl font-bold text-primary-200/50 select-none">404</h1>
+      <div class="absolute inset-0 flex items-center justify-center">
+        <div class="text-xl font-medium text-primary-600 bg-primary-50 dark:bg-primary-900/20 px-4 py-2 rounded-lg">
+          Page Not Found
+        </div>
+      </div>
+    </div>
+
+    <!-- Error Message -->
+    <div class="space-y-4">
+      <p class="text-gray-600 dark:text-gray-400 text-lg">
+        The page you're looking for doesn't exist or has been moved.
+      </p>
+    </div>
+
+    <!-- Navigation Options -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 space-y-4">
+      <h3 class="text-sm font-medium text-gray-900 dark:text-white text-left">Available Actions</h3>
+      <ul class="space-y-3">
+        <li>
+          <a routerLink="/" 
+             class="flex items-center justify-between p-3 text-sm rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors group">
+            <span class="flex items-center text-gray-700 dark:text-gray-300">
+              <svg class="w-5 h-5 mr-3 text-primary-600 group-hover:text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+              </svg>
+              Return to Homepage
+            </span>
+            <svg class="w-5 h-5 text-gray-400 group-hover:text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </a>
+        </li>
+        <!-- <li>
+          <a routerLink="/courses" 
+             class="flex items-center justify-between p-3 text-sm rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors group">
+            <span class="flex items-center text-gray-700 dark:text-gray-300">
+              <svg class="w-5 h-5 mr-3 text-primary-600 group-hover:text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+              Browse Courses
+            </span>
+            <svg class="w-5 h-5 text-gray-400 group-hover:text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </a>
+        </li> -->
+        <li>
+          <button (click)="goBack()" 
+                  class="w-full flex items-center justify-between p-3 text-sm rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors group">
+            <span class="flex items-center text-gray-700 dark:text-gray-300">
+              <svg class="w-5 h-5 mr-3 text-primary-600 group-hover:text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M11 15l-3-3m0 0l3-3m-3 3h8M3 12a9 9 0 1118 0 9 9 0 01-18 0z" />
+              </svg>
+              Go Back
+            </span>
+            <svg class="w-5 h-5 text-gray-400 group-hover:text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </li>
+      </ul>
+    </div>
+
+
+    <div class="text-sm text-gray-500 dark:text-gray-400">
+      <p>Need assistance? <a href="https://github.com/Denison-CS-349-Fall-2024/TA-Chatbot/issues" class="text-primary-600 hover:text-primary-500 font-medium">Contact Support</a></p>
+    </div>
+  </div>
+</div>

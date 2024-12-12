@@ -37,6 +37,8 @@ def load_pdf(file_path):
         text = ''
         for page in reader.pages:
             text += page.extract_text()
+        text = re.sub(r'\s+', ' ', text)  # Normalize whitespace
+        text = re.sub(r'[^\w\s.,;!?]', '', text)
     return text
 
 # Split text into chunks
@@ -126,13 +128,14 @@ def post_material(request):
             file_name = data.get('fileName', file.name)
             material_type = data.get('materialType', file.name)
             material_name = data.get('materialName', '')
+            material_semester = data.get('semester', '')
             course_identififer = data.get("class_id", "")
             file_size = file.size
             file_type = file.name.split('.')[-1]
 
             parsed_string = parse_course_string(course_identififer)
 
-            course = Course.objects.get_course_by_course_identifier(parsed_string[0], parsed_string[1], parsed_string[2])
+            course = Course.objects.get_course_by_course_identifier(material_semester, parsed_string[0], parsed_string[1], parsed_string[2])
             
             # Directly read the PDF content from the uploaded file
             reader = PdfReader(file)
@@ -141,7 +144,7 @@ def post_material(request):
                 text += page.extract_text()
 
             # Continue with the existing processing
-            chunks = split_text_into_chunks(text, chunk_size=250, chunk_overlap=50)
+            chunks = split_text_into_chunks(text, chunk_size=1000, chunk_overlap=200)
             embeddings = embed_chunks(chunks)
 
             index = initialize_index(index_name, INDEX_DIMENSION)
@@ -199,7 +202,7 @@ def get_materials_by_class_id(request, semester, classId):
     if request.method == "GET":
         try:
             department, courseNumber, section = parse_course_string(classId)
-            course = Course.objects.get_course_by_course_identifier(department, courseNumber, section)
+            course = Course.objects.get_course_by_course_identifier(semester, department, courseNumber, section)
             # materials = CourseMaterial.get_materials_by_course_id(course.id)
             materials = CourseMaterial.objects.get_materials_by_course_id(course.id)
 

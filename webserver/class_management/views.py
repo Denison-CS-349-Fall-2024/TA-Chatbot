@@ -7,6 +7,7 @@ import json
 import random
 import string
 from datetime import datetime
+from student_management.models import StudentEnrollments
 
 def generate_random_string(length=6):
     # Define the possible characters (uppercase, lowercase, and digits)
@@ -83,6 +84,35 @@ def create_course(request):
     return JsonResponse({'error': 'Invalid HTTP method'}, status=405)
 
 @csrf_exempt
+def all_courses(request):
+    if request.method == 'GET':
+        courses = Course.objects.all()
+        
+        # Convert QuerySet to list of dictionaries
+        courses_data = []
+
+        for course in courses:
+            professor = get_object_or_404(User, id=course.professor)
+            courses_data.append({
+                "id": str(course.id),
+                "name": course.name,
+                "courseTitle": course.name,
+                "department": course.department,
+                "courseNumber": course.course_number,
+                "section": course.section,
+                "semester": course.semester,
+                "credits": str(course.credits),
+                "professorFirstName": professor.first_name,
+                "professorLastName": professor.last_name,
+                "pin": course.pin,
+                "isActive": course.is_active
+            })
+        
+        return JsonResponse({'courses': courses_data}, status=200)
+    
+    return JsonResponse({'error': 'Invalid HTTP method'}, status=405)
+
+@csrf_exempt
 def update_course(request):
     if request.method == 'PUT':
         try:
@@ -109,7 +139,6 @@ def update_course(request):
                 course.credits = course_payload.get('credits')
 
             course.save()
-
             professor = get_object_or_404(User, id=course.professor)
 
             return JsonResponse({'message': 'Course updated successfully', 'course': {
@@ -123,8 +152,9 @@ def update_course(request):
                     'pin': course.pin,
                     'isActive': course.is_active,
                     'professorFirstName': professor.first_name,
-                    'professorLastName': professor.last_name
-                                    }}, status=200) 
+                    'professorLastName': professor.last_name,
+                    'lastUpdated': course.last_updated.isoformat()
+                }}, status=200)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
     return JsonResponse({'error': 'Invalid HTTP method'}, status=405)
@@ -150,4 +180,107 @@ def courses_by_professor(request, professor_id):
         return JsonResponse({'courses': courses_list}, status=200)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
+    
+def get_course_details(request, semester, department, course_number, section):
+    try:
+        course = Course.objects.get_course_by_course_identifier(
+            semester=semester,
+            department=department,
+            number=course_number,
+            section=section
+        )
+        
+        if not course:
+            return JsonResponse({'error': 'Course not found'}, status=404)
+
+        # Get enrolled students
+        enrollments = StudentEnrollments.objects.get_enrollments_by_course(course.id)
+        students_data = []
+        
+        for enrollment in enrollments:
+            student = enrollment.student
+            students_data.append({
+                'id': str(student.id),
+                'name': f"{student.first_name} {student.last_name}",
+                'email': student.email,
+                'status': 'Enrolled',
+                'lastActive': student.last_login.isoformat() if student.last_login else None
+            })
+
+        professor = get_object_or_404(User, id=course.professor)
+        
+        return JsonResponse({
+            'course': {
+                'id': str(course.id),
+                'courseTitle': course.name,
+                'section': course.section,
+                'department': course.department,
+                'courseNumber': course.course_number,
+                'semester': course.semester,
+                'pin': course.pin,
+                'credits': course.credits,
+                'isActive': course.is_active,
+                'lastUpdated': course.last_updated.isoformat(),
+                'professorName': f"{professor.first_name} {professor.last_name}",
+                'professorEmail': professor.email
+            },
+            'students': students_data
+        }, status=200)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
+    
+@csrf_exempt
+def update_course_settings(request):
+    if request.method == 'PUT':
+        try:
+            data = json.loads(request.body)
+            course_id = data.get('id')
+            
+            if not course_id:
+                return JsonResponse({'error': 'Course ID is required'}, status=400)
+            
+            course = get_object_or_404(Course, id=course_id)
+            
+            # Update basic course information
+            if 'courseTitle' in data:
+                course.name = data['courseTitle']
+            if 'section' in data:
+                course.section = data['section']
+            if 'department' in data:
+                course.department = data['department']
+            if 'courseNumber' in data:
+                course.course_number = data['courseNumber']
+            if 'credits' in data:
+                course.credits = data['credits']
+            if 'isActive' in data:
+                course.is_active = data['isActive']
+            
+            # Update the last_updated timestamp
+            course.last_updated = datetime.now()
+            course.save()
+            
+            professor = get_object_or_404(User, id=course.professor)
+            
+            return JsonResponse({
+                'message': 'Course settings updated successfully',
+                'course': {
+                    'id': str(course.id),
+                    'courseTitle': course.name,
+                    'department': course.department,
+                    'courseNumber': course.course_number,
+                    'section': course.section,
+                    'semester': course.semester,
+                    'credits': course.credits,
+                    'pin': course.pin,
+                    'isActive': course.is_active,
+                    'professorFirstName': professor.first_name,
+                    'professorLastName': professor.last_name,
+                    'lastUpdated': course.last_updated.isoformat()
+                }
+            }, status=200)
+            
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+    
+    return JsonResponse({'error': 'Invalid HTTP method'}, status=405)
     

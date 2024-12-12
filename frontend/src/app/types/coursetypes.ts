@@ -9,7 +9,8 @@ export interface Course  {
   professorFirstName: string,
   professorLastName: string,
   pin: string,
-  isActive: boolean
+  isActive: boolean,
+  lastUpdated?: string
 }
 
 export interface Material {
@@ -18,5 +19,4 @@ export interface Material {
   type: 'pdf' | 'docx'
   size: number
   uploadDate: Date,
-  
 }

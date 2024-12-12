@@ -18,6 +18,6 @@ export const routes: Routes = [
   {path: 'student-dashboard', component: StudentDashboardPageComponent, canActivate: mapToCanActivate([AuthGuard])},
   {path: 'loading-test', component: LoadingComponent},
   {path: 'not-found', component: NotFoundComponent},
-  // {path: '**', redirectTo: 'not-found'},
-  {path:'access-restricted', component:AccessRestrictedPageComponent}
+  {path: 'access-restricted', component: AccessRestrictedPageComponent},
+  { path: '**', component: NotFoundComponent }
 ];

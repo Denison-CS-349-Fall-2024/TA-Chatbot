@@ -21,10 +21,10 @@ class CourseManager(models.Manager):
         except Course.DoesNotExist:
             return ValueError("Invalid Material ID")
         
-    def get_course_by_course_identifier(self, department, number, section):
+    def get_course_by_course_identifier(self, semester, department, number, section):
 
         try:
-            course = self.get(department = department, course_number = number, section = section)
+            course = self.get(semester = semester, department = department, course_number = number, section = section)
             return course
         except Course.DoesNotExist:
             return ValueError("Could not find a course")
@@ -40,6 +40,7 @@ class Course(models.Model):
     professor = models.CharField(max_length=255)
     is_active = models.BooleanField(default=True)
     credits = models.IntegerField(default=4)
+    last_updated = models.DateTimeField(auto_now=True)
     objects = CourseManager()
     def __str__(self):
         return self.name
