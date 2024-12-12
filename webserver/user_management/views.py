@@ -58,6 +58,25 @@ def update_user_to_professor(request):
     
     return JsonResponse({'error': 'Invalid HTTP method'}, status=405)
 
+@csrf_exempt
+def update_user_to_student(request):
+    if request.method == 'PATCH':
+        try:
+            data = json.loads(request.body)
+            email = data.get('email')
+
+            user = User.objects.get(email=email)
+            
+            user.is_prof = False
+            user.is_staff = False
+            
+            user.save()
+
+            return JsonResponse({'message': f'{email} is now a student'}, status=201)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+    
+    return JsonResponse({'error': 'Invalid HTTP method'}, status=405)
 
 class UserRegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
