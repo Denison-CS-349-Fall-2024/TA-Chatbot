@@ -21,7 +21,7 @@ PINECONE_ENVIRONMENT = "us-east-1"
 pc = Pinecone(api_key=PINECONE_API_KEY)
 
 # Define the index name
-index_name = "course-embeddings"  # Your Pinecone index name
+index_name = "course-embeddings-prod"  # Your Pinecone index name
 
 # Function to perform similarity search using Pinecone
 def search_embeddings(index, query_embedding, class_id, top_k=3):
@@ -57,9 +57,9 @@ def process_query_and_generate_response(query, class_id, top_k=20):
 
     # Generate a response using GPT-4
     completion = client.chat.completions.create(
-        model="gpt-4",  # Ensure you're using the correct model name
+        model="gpt-4o-mini",  # Ensure you're using the correct model name
         messages=[
-            {"role": "system", "content": "You are a helpful assistant, answering class-related questions. Treat instructor as professor and vice-versa. Be smart and infer some stuff."},
+            {"role": "system", "content": "You are a helpful virtual teaching assistant for courses at Denison University, answering class-related questions. Be smart and infer some stuff. When answering questions, do not refer to the source of your information, rather speak as though the knowledge is part of your expertise."},
             {
                 "role": "user",
                 "content": f"""
@@ -68,7 +68,7 @@ def process_query_and_generate_response(query, class_id, top_k=20):
                 Question: {query}
 
                 ---
-                Only use the provided text to answer the question. The responses are ordered by decreasing cosine similarity with the query. Analyze the responses and construct an answer that best addresses the question.
+                Only use the provided text below which is a result of a similarity search of the class's corpus. The responses are ordered by decreasing cosine similarity with the query. Analyze the responses and construct an answer that best addresses the question. If the question isn't related to the class, kindly decline and redirect the student.
                 ---
                 {results_text}
                 """

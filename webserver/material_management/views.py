@@ -28,7 +28,7 @@ INDEX_DIMENSION = 384
 pc = Pinecone(api_key=PINECONE_API_KEY)
 
 # Define the index name
-index_name = "course-embeddings"  # Use a unique index name for each course
+index_name = "course-embeddings-prod"  # Use a unique index name for each course
 
 # Load PDF file
 def load_pdf(file_path):
@@ -38,7 +38,7 @@ def load_pdf(file_path):
         for page in reader.pages:
             text += page.extract_text()
         text = re.sub(r'\s+', ' ', text)  # Normalize whitespace
-        text = re.sub(r'[^\w\s.,;!?]', '', text)
+        text = re.sub(r'[^\w\s.!]', '', text)
     return text
 
 # Split text into chunks
