@@ -21,7 +21,6 @@ Students can access their course chatbots using unique PINs provided by their pr
 - [Environment Setup](#environment-setup)
 - [Development Setup](#development-setup)
 - [Production Setup](#production-setup)
-- [FAQ](#faq)
 - [Contribution](#contribution)
 - [License](#license)
 
