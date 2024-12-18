@@ -12,6 +12,19 @@ Students can access their course chatbots using unique PINs provided by their pr
     <a href="https://github.com/Denison-CS-349-Fall-2024/TA-Chatbot/issues">Request Feature</a>
 </p>
 
+## Table Of Contents
+
+- [Tech Stack](#tech-stack)
+- [Key Features](#key-features)
+- [Project Structure](#project-structure)
+- [Prerequisites](#prerequisites)
+- [Environment Setup](#environment-setup)
+- [Development Setup](#development-setup)
+- [Production Setup](#production-setup)
+- [FAQ](#faq)
+- [Contribution](#contribution)
+- [License](#license)
+
 ## Tech Stack
 
 - **Frontend**: Angular 18
@@ -50,15 +63,6 @@ TA-Chatbot/
 ├── docker-compose.yml        # Docker compose configuration
 └── README.md 
 ```
-
-## Table Of Contents
-
-- [Prerequisites](#prerequisites)
-- [Environment Setup](#environment-setup)
-- [Development Setup](#development-setup)
-- [Production Setup](#production-setup)
-- [Contribution](#contribution)
-- [License](#license)
 
 
 ## Prerequisites
