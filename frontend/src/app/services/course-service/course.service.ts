@@ -196,6 +196,8 @@ export class CourseService {
       lastUpdated: string;
       professorFirstName: string;
       professorLastName: string;
+      section: string;
+      pin: string;
     },
     students: {
       id: string;
@@ -214,9 +216,11 @@ export class CourseService {
         semester: string;
         credits: string;
         isActive: boolean;
-        lastUpdated: string;
+        lastUpdated: string;  
         professorFirstName: string;
         professorLastName: string;
+        section: string;
+        pin: string;
       },
       students: {
         id: string;

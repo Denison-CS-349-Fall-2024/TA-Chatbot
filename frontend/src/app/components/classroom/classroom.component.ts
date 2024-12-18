@@ -151,11 +151,15 @@ export class ClassroomComponent implements OnInit {
       this.courseService.getCourseDetails(
         this.semester,
         department,
-        parseInt(courseNumber),
+        courseNumber,
         section
       ).subscribe({
         next: (response) => {
-          this.courseDetails = response.course; // Update course details.
+          this.courseDetails = {
+            ...response.course,
+            section: response.course.section || '',
+            pin: response.course.pin || ''
+          };
           this.lastUpdated = response.course.lastUpdated; // Update last updated timestamp.
 
           // Initialize course settings with fetched data.
