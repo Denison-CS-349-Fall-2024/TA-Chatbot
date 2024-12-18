@@ -1,5 +1,9 @@
 # TA-Chatbot
-TA Chatbot is an application that allows professors to create AI-driven chatbots for their courses. Professors can upload course materials (syllabus, assignments, etc.) which the AI uses to answer student questions. Students can join classes using a PIN provided by their professor. This reduces the redudant communication between professors and students, and gives students quick, accurate answers based solely on approved course materials.
+
+TA Chatbot is an innovative educational tool designed to streamline course communication between professors and students. This platform enables professors to create personalized AI teaching assistants for their courses by uploading course materials such as syllabi, assignments, and other relevant documents. The AI processes these materials and creates a knowledge base specific to each course.
+
+Students can access their course chatbots using unique PINs provided by their professors. The chatbot provides instant, accurate responses to student queries by referencing only the approved course materials uploaded by the professor. This reduces the redudant communication between professors and students, and gives students quick, accurate answers based solely on approved course materials.
+
 <p align="center">
     <a href="https://www.ta-chat.website/">Site Url</a>
     ·
