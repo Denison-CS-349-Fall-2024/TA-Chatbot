@@ -1,30 +1,29 @@
 # TA-Chatbot
+TA Chatbot is an application that allows professors to create AI-driven chatbots for their courses. Professors can upload course materials (syllabus, assignments, etc.) which the AI uses to answer student questions. Students can join classes using a PIN provided by their professor. This reduces the redudant communication between professors and students, and gives students quick, accurate answers based solely on approved course materials.
+<p align="center">
+    <a href="https://www.ta-chat.website/">Site Url</a>
+    ·
+    <a href="https://github.com/Denison-CS-349-Fall-2024/TA-Chatbot/issues">Report Bug</a>
+    ·
+    <a href="https://github.com/Denison-CS-349-Fall-2024/TA-Chatbot/issues">Request Feature</a>
+  </p>
 
-## Project Description
 
-TA Chatbot is a application that allows teachers to integrate their syllabus into a AI-driven chatbot to provide students an easy way ask questions about the syllabus, assignments, or course materials with quick and accurate responses.
-
-## Contributors
-- [Tomer Ozmo](https://github.com/contributor3) - Group Leader
-- [Anish Banswada](https://github.com/contributor2) - Code Lead
-- [Cameron Smith](https://github.com/csmith2025) - Style Lead
-- [Lihn Nguyen](https://github.com/contributor2) - Quality Assurance Lead
-- [Shashank Rana](https://github.com/contributor3) - Design Lead
-- [Liam Quinlan](https://github.com/contributor1) - Client Lead
 
 ## Table Of Contents
-- [Project Description](#project-description)
-- [Contributors](#contributors)
 - [Prerequisites](#prerequisites)
 - [Environment Setup](#environment-setup)
 - [Development Setup](#development-setup)
 - [Production Setup](#production-setup)
+- [Contribution](#contribution)
+- [License](#license)
+
 
 ## Prerequisites
-- Docker
-- Node.js 18+ (for local development)
-- Python 3.11 (for local development)
-- Git
+- [Docker](https://docs.docker.com/engine/install/)
+- [Node.js 18+](https://nodejs.org/en/download/package-manager/current)
+- [Python 3.11](https://www.python.org/downloads/)
+- [Angular CLI](https://angular.dev/tools/cli)
 
 ## Environment Setup
 
@@ -47,7 +46,7 @@ OPENAI_API_KEY=your_openai_api_key
 POSTGRES_DB=ta_chatbot_db
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=your_secure_password
-POSTGRES_HOST=db        # Use 'localhost' if running Django locally without Docker
+POSTGRES_HOST=localhost
 POSTGRES_PORT=5432
 
 # Django Secret Key
@@ -59,8 +58,6 @@ PINECONE_API_KEY=your_pinecone_api_key
 
 ## Development Setup
 
-### Option 1: Full Local Development
-
 1. Setup Frontend:
 ```bash
 cd frontend
@@ -70,6 +67,7 @@ npm start
 Frontend will be available at `http://localhost:4200`
 
 2. Setup Backend:
+- Ensure PostgreSQL is running on your local machine (port 5432)
 ```bash
 cd webserver
 python -m venv venv
@@ -80,23 +78,32 @@ python manage.py runserver
 ```
 Backend will be available at `http://localhost:8000`
 
-### Option 2: Local Development with Dockerized Database
-
-1. Follow the local development steps above for frontend and backend, but ensure your `.env` file has:
-```env
-POSTGRES_HOST=localhost  # When running Django locally
-```
-
-2. Start only the database container:
+3. Running Tests:
 ```bash
-docker compose up db -d
+cd webserver
+python manage.py test
 ```
 
 ## Production Setup
 
-1. Build and run all services using Docker Compose:
+1. Ensure all [prerequisites](#prerequisites) are installed
+2. Update `.env` file to use:
+```env
+POSTGRES_HOST=db  # Required for Docker deployment
+```
+
+3. Build and run all services:
 ```bash
 docker compose up --build -d
+```
+
+4. Run database migrations:
+```bash
+# Find the webserver container ID
+docker ps
+
+# Run migrations inside the webserver container
+docker exec -it <webserver-container-id> python manage.py migrate
 ```
 
 This will:
@@ -113,15 +120,10 @@ docker compose down
 ```bash
 docker compose logs -f
 ```
+## Contribution
 
-## Accessing the Application
+We welcome contributions from the community! If you'd like to contribute please open a pull request. If you have any questions or requests for new features, please open an issue in our [Issues tab](https://github.com/Denison-CS-349-Fall-2024/TA-Chatbot/issues). We appreciate your input in making this tool better for everyone.
 
-- Frontend: http://127.0.0.1:4200
-- Backend API: http://127.0.0.1:8000
-- Admin Interface: http://127.0.0.1:8000/admin
+## License
 
-## Notes
-
-- For development with a Dockerized database only, make sure to update the `POSTGRES_HOST` in your `.env` file to `localhost`
-- For full Docker deployment, keep `POSTGRES_HOST=db` in your `.env` file
-- The production setup uses Nginx to serve the frontend and Gunicorn for the backend
+TA-Chatbot is licensed under the [MIT License](LICENSE).
