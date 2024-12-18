@@ -1,8 +1,8 @@
 # TA-Chatbot
 
-TA Chatbot is an innovative educational tool designed to streamline course communication between professors and students. This platform enables professors to create personalized AI teaching assistants for their courses by uploading course materials such as syllabi, assignments, and other relevant documents. The AI processes these materials and creates a knowledge base specific to each course.
+TA Chatbot is an innovative educational tool designed to streamline course communication between professors and students. This platform enables professors to create personalized AI teaching assistants for their courses by uploading course materials such as syllabi, assignments, lecture notes, and other relevant documents. The AI processes these materials and creates a knowledge base specific to each course.
 
-Students can access their course chatbots using unique PINs provided by their professors. The chatbot provides instant, accurate responses to student queries by referencing only the approved course materials uploaded by the professor. This reduces the redudant communication between professors and students, and gives students quick, accurate answers based solely on approved course materials.
+Students can access their course chatbots using unique PINs provided by their professors. The chatbot provides instant, accurate responses to student queries by referencing only the approved course materials uploaded by the professor. This ensures that students receive consistent, reliable information while significantly reducing the number of repetitive questions professors need to address via email.
 
 <p align="center">
     <a href="https://www.ta-chat.website/">Site Url</a>
@@ -10,11 +10,49 @@ Students can access their course chatbots using unique PINs provided by their pr
     <a href="https://github.com/Denison-CS-349-Fall-2024/TA-Chatbot/issues">Report Bug</a>
     ·
     <a href="https://github.com/Denison-CS-349-Fall-2024/TA-Chatbot/issues">Request Feature</a>
-  </p>
+</p>
 
+## Tech Stack
 
+- **Frontend**: Angular 18
+- **Backend**: Django REST Framework
+- **Database**: PostgreSQL
+- **Containerization**: Docker
+- **Cloud Platform**: AWS
+- **AI Integration**: OpenAI API
+- **Vector Database**: Pinecone
+
+## Key Features
+
+- **Course Management**: Professors can create and manage multiple courses
+- **Secure Access**: PIN-based enrollment system for students
+- **AI-Powered Responses**: Contextual answers based on course materials
+- **Real-time Chat**: Instant responses to student queries
+- **24/7 Availability**: Round-the-clock access to course information
+- **User Authentication**: Secure Google OAuth integration
+
+## Project Structure
+
+```
+TA-Chatbot/
+├── frontend/                 # Angular frontend application
+│   └── src/                  # Source files for the frontend
+├── webserver/               # Django backend application
+│   ├── chatbot_management/  # application for chatbot logic
+│   ├── class_management/  # application for class logic
+│   ├── material_management/  # application for materials logic
+│   ├── student_management/  # application for student enrollment logic
+│   ├── user_management/  # application for user management logic
+│   ├── requirements.txt  # dependencies
+│   ├── webserver/  # application for webserver logic
+│   └── ..
+├── .env  # environment variables
+├── docker-compose.yml  # Docker compose configuration
+└── README.md 
+```
 
 ## Table Of Contents
+
 - [Prerequisites](#prerequisites)
 - [Environment Setup](#environment-setup)
 - [Development Setup](#development-setup)
