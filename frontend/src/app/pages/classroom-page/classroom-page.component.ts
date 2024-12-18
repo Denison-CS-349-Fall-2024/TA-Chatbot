@@ -4,15 +4,17 @@ import { CourseService } from "../../services/course-service/course.service";
 import { ActivatedRoute, Router } from "@angular/router";
 import { LoadingComponent } from "../../components/loading/loading.component";
 
-
+/**
+ * Component representing the classroom page.
+ */
 @Component({
   selector: 'app-classroom-page',
   standalone: true,
   imports: [ClassroomComponent, LoadingComponent],
   templateUrl: './classroom-page.component.html',
-  styleUrl: './classroom-page.component.css'
+  styleUrls: ['./classroom-page.component.css']
 })
-export class ClassroomPageComponent{
+export class ClassroomPageComponent {
   
   protected isLoading = true;
   protected semester!: string;
@@ -22,13 +24,15 @@ export class ClassroomPageComponent{
     protected courseService: CourseService,
     private route: ActivatedRoute,
     private router: Router,
-  ) {
-  }
+  ) {}
 
+  /**
+   * Initializes the component and fetches the course materials.
+   */
   async ngOnInit() {
     this.semester = this.route.snapshot.paramMap.get("semester")!;
     this.courseAndSection = this.route.snapshot.paramMap.get("courseAndSection")!;
-    try{
+    try {
       await this.courseService.fetchMaterials(this.semester, this.courseAndSection);
     } catch (error) {
       this.router.navigate(['/not-found']);

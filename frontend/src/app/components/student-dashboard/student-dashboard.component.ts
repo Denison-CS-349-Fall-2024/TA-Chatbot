@@ -11,6 +11,10 @@ import { EnrollmentModalComponent } from '../enrollment-modal/enrollment-modal.c
 import { ToastService } from '../../services/toast-service/toast.service';
 import { formatSemester } from '../../utils/format';
 
+/**
+ * The StudentDashboardComponent represents the dashboard for students,
+ * displaying courses and providing features like enrollment and course filtering.
+ */
 @Component({
   selector: 'app-student-dashboard',
   standalone: true,
@@ -19,19 +23,38 @@ import { formatSemester } from '../../utils/format';
   styleUrl: './student-dashboard.component.css'
 })
 export class StudentDashboardComponent implements OnInit, OnDestroy {
+  // Indicates whether the instructor view is enabled.
   @Input() isInstructorView = false;
+
+  // Array to store the list of courses.
   protected courses!: Course[];
+
+  // Subscription to track changes to the courses data stream.
   protected coursesSubscription!: Subscription;
+
+  // Observable representing the currently logged-in user.
   protected currentUser$: Observable<User | null>;
+
+  // Flag indicating whether the component is loading data.
   protected isLoading = true;
+
+  // Search term for filtering courses.
   protected searchTerm = '';
+
+  // Selected semester for filtering courses.
   protected selectedSemester = 'all';
+
+  // Flag to show or hide the enrollment modal.
   protected showEnrollModal = false;
+
+  // Current view type, either 'grid' or 'list'.
   protected view: 'grid' | 'list' = 'grid';
+
+  // Statistics related to courses.
   protected stats = {
-    totalCourses: 0,
-    totalCredits: 0,
-    currentSemesterCourses: 0
+    totalCourses: 0, // Total number of courses.
+    totalCredits: 0, // Total credits of all courses.
+    currentSemesterCourses: 0 // Number of courses in the current semester.
   };
 
   constructor(
@@ -40,9 +63,14 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
     private toastService: ToastService,
     private router: Router
   ) {
+    // Assign the current user observable from the AuthService.
     this.currentUser$ = this.authService.currentUser;
   }
 
+  /**
+   * Lifecycle hook for initialization.
+   * Subscribes to the courses observable and updates statistics when data changes.
+   */
   ngOnInit() {
     this.coursesSubscription = this.courseService.courses$.subscribe(courses => {
       this.courses = courses;
@@ -51,16 +79,28 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * Lifecycle hook for cleanup.
+   * Unsubscribes from the courses observable to prevent memory leaks.
+   */
   ngOnDestroy() {
     if (this.coursesSubscription) {
       this.coursesSubscription.unsubscribe();
     }
   }
 
+  /**
+   * Formats the semester string into a readable format.
+   * @param semester - The semester string to format.
+   */
   formatSemester(semester: string): string {
     return formatSemester(semester);
   }
 
+  /**
+   * Returns a CSS class string based on the semester's season.
+   * @param semester - The semester string.
+   */
   getSemesterColor(semester: string): string {
     const season = semester.slice(0, -4).toLowerCase();
     switch (season) {
@@ -77,6 +117,9 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * Filters and sorts courses based on the search term and selected semester.
+   */
   getFilteredCourses() {
     if (!this.courses) return [];
     
@@ -112,28 +155,43 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * Opens the enrollment modal.
+   */
   openEnrollModal() {
     this.showEnrollModal = true;
   }
 
+  /**
+   * Closes the enrollment modal.
+   */
   closeEnrollModal() {
     this.showEnrollModal = false;
   }
 
+  /**
+   * Handles a successful enrollment action and shows a toast notification.
+   * @param course - The course that the user enrolled in.
+   */
   handleEnrollmentSuccess(course: Course) {
     this.toastService.show(
       'success',
       'Enrollment Successful',
       `You have been enrolled in ${course.courseTitle}`
     );
-    //TODO: change this to students courses:
     this.courseService.getInstructorCourses(this.authService.getId()!);
   }
 
+  /**
+   * Toggles the view between grid and list modes.
+   */
   toggleView() {
     this.view = this.view === 'grid' ? 'list' : 'grid';
   }
 
+  /**
+   * Updates the course statistics based on the current course list.
+   */
   private updateStats() {
     if (!this.courses) return;
     
@@ -145,6 +203,9 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
     };
   }
 
+  /**
+   * Determines the current semester based on the current date.
+   */
   private getCurrentSemester(): string {
     const now = new Date();
     const year = now.getFullYear();
@@ -154,10 +215,17 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
     return `fall${year}`;
   }
 
+  /**
+   * Navigates to the chat page for a specific course.
+   * @param course - The course to navigate to.
+   */
   navigateToChat(course: Course) {
     this.router.navigate([`/chat/${course.semester}/${course.department}${course.courseNumber}-${course.section}`]);
   }
 
+  /**
+   * Handles user logout and redirects to the login page.
+   */
   async handleLogout() {
     try {
       await this.authService.logout();
@@ -171,4 +239,3 @@ export class StudentDashboardComponent implements OnInit, OnDestroy {
     }
   }
 }
-

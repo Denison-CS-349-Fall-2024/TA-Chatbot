@@ -2,8 +2,10 @@
 
 from django.db import migrations, models
 
-
 class Migration(migrations.Migration):
+    """
+    Migration to rename the 'name' field to 'first_name' and add the 'last_name' field to the User model.
+    """
 
     dependencies = [
         ('user_management', '0001_initial'),

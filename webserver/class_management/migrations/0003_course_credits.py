@@ -2,8 +2,10 @@
 
 from django.db import migrations, models
 
-
 class Migration(migrations.Migration):
+    """
+    Migration to add the 'credits' field to the Course model.
+    """
 
     dependencies = [
         ('class_management', '0002_course_is_active'),

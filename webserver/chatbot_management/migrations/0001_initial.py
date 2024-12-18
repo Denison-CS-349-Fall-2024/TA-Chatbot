@@ -2,8 +2,10 @@
 
 from django.db import migrations, models
 
-
 class Migration(migrations.Migration):
+    """
+    Initial migration to create the ChatSession model.
+    """
 
     initial = True
 

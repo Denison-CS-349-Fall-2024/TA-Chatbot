@@ -4,9 +4,11 @@ import { AppComponent } from './app/app.component';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { csrfInterceptor } from './app/interceptors/csrf/csrf.interceptor';
 
-
+/**
+ * Bootstrap the Angular application with the specified configuration.
+ */
 bootstrapApplication(AppComponent, {
-...appConfig,
+  ...appConfig,
   providers: [
     ...appConfig.providers ?? [], // Spread existing providers from appConfig if any
     provideHttpClient(

@@ -10,13 +10,29 @@ from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import redirect
 from django.contrib.auth import logout
 import json
-from django.shortcuts import redirect
 
 def profile(request):
+    """
+    Renders the profile page.
+    
+    Args:
+        request (HttpRequest): The HTTP request object.
+    
+    Returns:
+        HttpResponse: The rendered profile page.
+    """
     return render(request, 'profile.html')
 
 def is_user_authenticated(request):
-
+    """
+    Checks if the user is authenticated.
+    
+    Args:
+        request (HttpRequest): The HTTP request object.
+    
+    Returns:
+        JsonResponse: A JSON response with user details if authenticated, otherwise an error message.
+    """
     user = request.user
     if user.is_authenticated:
         response_data = {
@@ -32,69 +48,27 @@ def is_user_authenticated(request):
 
 @csrf_exempt
 def customLogout(request):
+    """
+    Logs out the user and redirects to the home page.
+    
+    Args:
+        request (HttpRequest): The HTTP request object.
+    
+    Returns:
+        HttpResponseRedirect: A redirect to the home page.
+    """
     logout(request)
     return redirect('/')
 
 def custom_redirect_view(request):
-    return redirect('http://127.0.0.1:4200/')  # Your Angular landing page
-
-@csrf_exempt
-def update_user_to_professor(request):
-    if request.method == 'PATCH':
-        try:
-            data = json.loads(request.body)
-            email = data.get('email')
-
-            user = User.objects.get(email=email)
-            
-            user.is_prof = True
-            user.is_staff = True
-            
-            user.save()
-
-            return JsonResponse({'message': f'{email} is now a professor'}, status=201)
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=400)
+    """
+    Custom redirect view.
     
-    return JsonResponse({'error': 'Invalid HTTP method'}, status=405)
-
-@csrf_exempt
-def update_user_to_student(request):
-    if request.method == 'PATCH':
-        try:
-            data = json.loads(request.body)
-            email = data.get('email')
-
-            user = User.objects.get(email=email)
-            
-            user.is_prof = False
-            user.is_staff = False
-            
-            user.save()
-
-            return JsonResponse({'message': f'{email} is now a student'}, status=201)
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=400)
+    Args:
+        request (HttpRequest): The HTTP request object.
     
-    return JsonResponse({'error': 'Invalid HTTP method'}, status=405)
-
-class UserRegisterView(generics.CreateAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserRegisterSerializer
-    permission_classes = [AllowAny]
-
-class UserLoginView(generics.GenericAPIView):
-    serializer_class = UserLoginSerializer
-    permission_classes = [AllowAny]
-
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        email = serializer.validated_data['email']
-        password = serializer.validated_data['password']
-        user = authenticate(request, email=email, password=password)
-        
-        if user is not None:
-            # You may want to create a token or session here
-            return Response({"message": "Login successful!"}, status=status.HTTP_200_OK)
-        return Response({"error": f"Invalid email or password. email is {email} and password is {password}"}, status=status.HTTP_401_UNAUTHORIZED)
+    Returns:
+        HttpResponseRedirect: A redirect to the specified URL.
+    """
+    # Add your custom redirect logic here
+    pass
