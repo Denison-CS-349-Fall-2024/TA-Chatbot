@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { LandingPageComponent } from './landing-page.component';
 
 describe('LandingPageComponent', () => {
@@ -17,6 +16,9 @@ describe('LandingPageComponent', () => {
     fixture.detectChanges();
   });
 
+  /**
+   * Test to check if the component is created.
+   */
   it('should create', () => {
     expect(component).toBeTruthy();
   });

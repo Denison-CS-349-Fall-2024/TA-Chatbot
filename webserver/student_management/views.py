@@ -7,14 +7,30 @@ from user_management.models import User
 import json
 
 
+"""
+Student Management Views
+Handles student enrollment operations and queries.
+
+This module manages:
+- Student course enrollments
+- Enrollment queries
+- Course roster management
+"""
+
+
 @csrf_exempt
 def create_enrollment(request):
     """
     Creates a new enrollment for a student in a course.
-    Expects JSON: { "student_id": <user_id>, "course_id": <course_id> }
-    """
 
+    Args:
+        request: HTTP request containing student_id and course_id
+
+    Returns:
+        JsonResponse: Enrollment status and details
+    """
     if request.method == 'POST':
+        # Parse request data
         data = json.loads(request.body)
         student_id = data.get('student_id')
         course_id = data.get('course_id')
@@ -48,6 +64,7 @@ def create_enrollment(request):
                 "error_code": "DUPLICATE_ENROLLMENT"
             }, status=409)
 
+        # Create new enrollment
         enrollment = StudentEnrollments.objects.create_enrollment(student, course)
         return JsonResponse({
             "message": "Enrollment created successfully.",
@@ -61,8 +78,16 @@ def create_enrollment(request):
 def delete_enrollment(request, enrollment_id):
     """
     Deletes an enrollment by its ID.
+
+    Args:
+        request: HTTP request
+        enrollment_id (int): ID of enrollment to delete
+
+    Returns:
+        JsonResponse: Deletion status
     """
     if request.method == 'DELETE':
+        # Attempt to delete enrollment
         success = StudentEnrollments.objects.delete_enrollment(enrollment_id)
 
         if success:
@@ -74,13 +99,23 @@ def delete_enrollment(request, enrollment_id):
 
 def get_enrollments_by_student(request, student_id):
     """
-    Retrieves all enrollments for a given student.
+    Retrieves all course enrollments for a student.
+
+    Args:
+        request: HTTP request
+        student_id (int): Student's unique identifier
+
+    Returns:
+        JsonResponse: List of student's course enrollments
     """
+    # Get student object or return 404
     student = get_object_or_404(User, id=student_id)
+    # Retrieve all enrollments for student
     enrollments = StudentEnrollments.objects.get_enrollments_by_student(student)
 
     enrollment_data = []
 
+    # Build enrollment data list
     for enrollment in enrollments:
         professor = get_object_or_404(User, id=enrollment.course.professor)
 
@@ -100,13 +135,24 @@ def get_enrollments_by_student(request, student_id):
 
     return JsonResponse({"enrollments": enrollment_data})
 
+
 def get_enrollments_by_course(request, course_id):
     """
-    Retrieves all enrollments for a given course.
+    Retrieves all student enrollments for a course.
+
+    Args:
+        request: HTTP request
+        course_id (int): Course's unique identifier
+
+    Returns:
+        JsonResponse: List of enrolled students
     """
+    # Get course object or return 404
     course = get_object_or_404(Course, id=course_id)
+    # Retrieve all enrollments for course
     enrollments = StudentEnrollments.objects.get_enrollments_by_course(course)
     
+    # Build enrollment data list with student information
     enrollment_data = [
         {
             "enrollment_id": enrollment.id,
@@ -127,9 +173,17 @@ def get_enrollments_by_course(request, course_id):
 def list_enrollments(request):
     """
     Lists all enrollments for administrative purposes.
+
+    Args:
+        request: HTTP request
+
+    Returns:
+        JsonResponse: List of all enrollments with student and course details
     """
+    # Retrieve all enrollments
     enrollments = StudentEnrollments.objects.all()
 
+    # Build comprehensive enrollment data list
     enrollment_data = [
         {
             "enrollment_id": enrollment.id,

@@ -1,3 +1,13 @@
+"""
+ChatBot Management Views
+Handles AI-powered chat functionality using OpenAI and Pinecone for vector search.
+
+This module provides functionality to:
+- Process user queries against course materials
+- Perform similarity searches using Pinecone
+- Generate AI responses using OpenAI's GPT models
+"""
+
 import os
 from dotenv import load_dotenv
 from pinecone import Pinecone
@@ -25,11 +35,24 @@ index_name = "course-embeddings-prod"  # Your Pinecone index name
 
 # Function to perform similarity search using Pinecone
 def search_embeddings(index, query_embedding, class_id, top_k=3):
-    # Construct metadata filters for class_id and material_type
+    """
+    Performs similarity search in Pinecone index for relevant course materials.
+
+    Args:
+        index: Pinecone index instance
+        query_embedding: Vector embedding of the query
+        class_id (str): Identifier for the course
+        top_k (int): Number of results to return
+
+    Returns:
+        dict: Pinecone search results containing similar documents
+    """
+    # Construct metadata filters for class_id
     query_filter = {
         'class_id': class_id,
     }
     
+    # Perform vector similarity search
     results = index.query(
         vector=query_embedding.tolist(),
         top_k=top_k,
@@ -40,24 +63,33 @@ def search_embeddings(index, query_embedding, class_id, top_k=3):
 
 # Function to process the query and get the response
 def process_query_and_generate_response(query, class_id, top_k=20):
+    """
+    Processes a user query and generates an AI response.
 
-    # Create the query embedding using SentenceTransformer
+    Args:
+        query (str): User's question
+        class_id (str): Identifier for the course
+        top_k (int): Number of similar documents to consider
+
+    Returns:
+        str: AI-generated response based on course materials
+    """
+    # Initialize sentence transformer model
     model = SentenceTransformer('all-MiniLM-L6-v2')
     query_embedding = model.encode(query, convert_to_tensor=True)
 
-    # Initialize Pinecone index and perform similarity search
+    # Initialize Pinecone index and perform search
     index = pc.Index(index_name)
     search_results = search_embeddings(index, query_embedding, class_id, top_k)
 
-    # Gather the most relevant results
+    # Aggregate relevant results
     results_text = ""
     for match in search_results['matches']:
         results_text += match['metadata']['text'] + '\n'
 
-
-    # Generate a response using GPT-4
+    # Generate response using GPT-4o
     completion = client.chat.completions.create(
-        model="gpt-4o-mini",  # Ensure you're using the correct model name
+        model="gpt-4o-mini",
         messages=[
             {"role": "system", "content": "You are a helpful virtual teaching assistant for courses at Denison University, answering class-related questions. Be smart and infer some stuff. When answering questions, do not refer to the source of your information, rather speak as though the knowledge is part of your expertise."},
             {
@@ -76,39 +108,25 @@ def process_query_and_generate_response(query, class_id, top_k=20):
         ],
         temperature=0.6
     )
-    # Extract the response from GPT-4
-    response_content = completion.choices[0].message.content
-    return response_content  # Return the raw content for further processing
+    return completion.choices[0].message.content
 
 # View to handle the query request
 @csrf_exempt
 def process_query(request):
-    data = json.loads(request.body)
+    """
+    API endpoint to handle chat queries.
 
+    Args:
+        request: HTTP request containing query and class_id
+
+    Returns:
+        JsonResponse: AI-generated response to the query
+    """
+    # Parse request data
+    data = json.loads(request.body)
     class_id = data.get("class_id")
     question = data.get("query")
 
+    # Process query and return response
     response_content = process_query_and_generate_response(question, class_id)
     return JsonResponse({'response': response_content})
-
-    # if request.method == "POST"
-    # question = request.GET.get('question')  # Get the question from query parameters
-    # class_id = request.GET.get('class_id')  # Example: Use the class ID from query parameters. if class_id not provided  ,'CS371-01' default 
-    # material_type = request.GET.get('material_type')  # Example: Use the material type from query parameters
-
-    # Get the response for the query
-    # response_content = process_query_and_generate_response(question, class_id, material_type)
-    
-    # Return the response as JSON
-    # return JsonResponse({'response': response_content})
-
-
-
-# If you want to run this script directly, uncomment the lines below
-# if __name__ == "__main__":
-#     pdf_file = "./syl.pdf"  # Path to your PDF file
-#     query = "What time does the class meet?"  # Example query
-#     process_pdf_and_query(pdf_file, query)  # Call the function
-
-
-

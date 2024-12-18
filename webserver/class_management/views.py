@@ -1,3 +1,13 @@
+"""
+Class Management Views
+Handles all classroom-related operations including creation, updates, and queries.
+
+This module provides functionality for:
+- Course creation and management
+- Course queries and filters
+- Course settings updates
+"""
+
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
@@ -10,20 +20,43 @@ from datetime import datetime
 from student_management.models import StudentEnrollments
 
 def generate_random_string(length=6):
+    """
+    Generates a random string for course PIN.
+
+    Args:
+        length (int): Length of the string to generate
+
+    Returns:
+        str: Random string containing letters and numbers
+    """
     # Define the possible characters (uppercase, lowercase, and digits)
     characters = string.ascii_letters + string.digits
-
     random_string = ''.join(random.choice(characters) for _ in range(length))
     return random_string
 
 def get_current_semester():
-    return f"{'spring' if datetime.now().month < 6 else 'fall'}{datetime.now().year}"
+    """
+    Determines the current academic semester based on date.
 
+    Returns:
+        str: Current semester in format 'season+year' (e.g., 'fall2024')
+    """
+    return f"{'spring' if datetime.now().month < 6 else 'fall'}{datetime.now().year}"
 
 @csrf_exempt
 def create_course(request):
+    """
+    Creates a new course with provided details.
+
+    Args:
+        request: HTTP request containing course details in POST body
+
+    Returns:
+        JsonResponse: Course creation status and details
+    """
     if request.method == 'POST':
         try:
+            # Extract course data from request
             data = json.loads(request.body)
             section = data.get('section')
             department = data.get('department')
@@ -42,7 +75,7 @@ def create_course(request):
                 return JsonResponse({
                     'error': 'A course with these details already exists',
                     'details': 'Course with the same section, number, and department already exists for this semester'
-                }, status=409)  # 409 Conflict status code
+                }, status=409)
 
             # Continue with course creation if no duplicate exists
             name = data.get('name')
@@ -51,6 +84,7 @@ def create_course(request):
             credits = data.get('credits')
             professor = get_object_or_404(User, id=professor)
 
+            # Create new course
             course = Course.objects.create_course(
                 name=name,
                 pin=pin,
@@ -85,7 +119,17 @@ def create_course(request):
 
 @csrf_exempt
 def all_courses(request):
+    """
+    Retrieves all courses in the system.
+
+    Args:
+        request: HTTP request
+
+    Returns:
+        JsonResponse: List of all courses with their details
+    """
     if request.method == 'GET':
+        # Get all courses
         courses = Course.objects.all()
         
         # Convert QuerySet to list of dictionaries
@@ -114,15 +158,27 @@ def all_courses(request):
 
 @csrf_exempt
 def update_course(request):
+    """
+    Updates existing course details.
+
+    Args:
+        request: HTTP request containing updated course information
+
+    Returns:
+        JsonResponse: Updated course details
+    """
     if request.method == 'PUT':
         try:
+            # Extract course data from request
             course_payload = json.loads(request.body)
 
             if (course_payload.get('id') == None):
                 return JsonResponse({'error': 'Course ID is required'}, status=400)
             
+            # Get course object
             course = get_object_or_404(Course, id=course_payload.get('id'))
 
+            # Update course fields if provided
             if (course_payload.get('courseTitle') != None):
                 course.name = course_payload.get('courseTitle')
             if (course_payload.get('department') != None):
@@ -161,6 +217,16 @@ def update_course(request):
 
 @csrf_exempt
 def delete_course(request, course_id):
+    """
+    Deletes a course from the system.
+
+    Args:
+        request: HTTP request
+        course_id (int): ID of course to delete
+
+    Returns:
+        JsonResponse: Deletion status
+    """
     if request.method == 'DELETE':
         try:
             course = get_object_or_404(Course, id=course_id)
@@ -172,17 +238,54 @@ def delete_course(request, course_id):
     return JsonResponse({'error': 'Invalid HTTP method'}, status=405)
 
 def courses_by_professor(request, professor_id):
+    """
+    Retrieves all courses taught by a specific professor.
+
+    Args:
+        request: HTTP request
+        professor_id (int): Professor's unique identifier
+
+    Returns:
+        JsonResponse: List of courses taught by the professor
+    """
     try:
         professor = get_object_or_404(User, id=professor_id)
         courses = Course.objects.filter(professor=professor_id)
-        courses_list = [{'id': course.id,'name': course.name, 'section':course.section, 'pin': course.pin, 'department': course.department, 'semester': course.semester, 'courseTitle': course.name, 'courseNumber': course.course_number, 'isActive': course.is_active, 'credits': course.credits, 'professorFirstName': professor.first_name, 'professorLastName': professor.last_name} for course in courses]
+        courses_list = [{
+            'id': course.id,
+            'name': course.name, 
+            'section': course.section, 
+            'pin': course.pin, 
+            'department': course.department, 
+            'semester': course.semester, 
+            'courseTitle': course.name, 
+            'courseNumber': course.course_number, 
+            'isActive': course.is_active, 
+            'credits': course.credits, 
+            'professorFirstName': professor.first_name, 
+            'professorLastName': professor.last_name
+        } for course in courses]
         
         return JsonResponse({'courses': courses_list}, status=200)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
     
 def get_course_details(request, semester, department, course_number, section):
+    """
+    Retrieves detailed information about a specific course.
+
+    Args:
+        request: HTTP request
+        semester (str): Course semester
+        department (str): Department code
+        course_number (int): Course number
+        section (str): Section identifier
+
+    Returns:
+        JsonResponse: Detailed course information including enrolled students
+    """
     try:
+        # Get course object
         course = Course.objects.get_course_by_course_identifier(
             semester=semester,
             department=department,
@@ -197,6 +300,7 @@ def get_course_details(request, semester, department, course_number, section):
         enrollments = StudentEnrollments.objects.get_enrollments_by_course(course.id)
         students_data = []
         
+        # Build student data list
         for enrollment in enrollments:
             student = enrollment.student
             students_data.append({

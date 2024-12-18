@@ -1,11 +1,14 @@
 import { Component } from '@angular/core';
 
+/**
+ * Component representing a loading spinner.
+ */
 @Component({
   selector: 'app-loading',
   standalone: true,
   imports: [],
   template: `
- <div class="flex w-[100vw] h-[100vh] justify-center items-center space-x-1 text-sm text-gray-700 bg-gray-300 absolute z-[100]">
+    <div class="flex w-[100vw] h-[100vh] justify-center items-center space-x-1 text-sm text-gray-700 bg-gray-300 absolute z-[100]">
       <svg
         fill="none"
         class="w-32 h-32 animate-spin"
@@ -19,16 +22,13 @@ import { Component } from '@angular/core';
           fillRule="evenodd"
         />
       </svg>
-
       <div class="text-2xl">
         Loading ...
       </div>
     </div>
-
   `,
-  styleUrl: './loading.component.css'
+  styleUrls: ['./loading.component.css']
 })
 export class LoadingComponent {
 
 }
-

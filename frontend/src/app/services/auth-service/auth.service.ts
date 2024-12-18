@@ -16,17 +16,24 @@ export class AuthService {
   public currentUser: Observable<User | null> = this.currentUserSubject.asObservable();
 
   constructor(private router: Router, private http: HttpClient, private cookieService: CookieService) {
-    //this.getUser()
+    // Check session status on initialization
     this.checkSessionStatus().subscribe();
   }
 
+  /**
+   * Initiates the login process.
+   */
   login() {
-    this.cookieService.set('userType', "instructor" );
-    window.location.href = `${environment.apiEndpoint}/accounts/login`
+    this.cookieService.set('userType', "instructor");
+    window.location.href = `${environment.apiEndpoint}/accounts/login`;
   }
 
-    checkSessionStatus(): Observable<User | null> {
-
+  /**
+   * Checks the session status of the user.
+   * 
+   * @returns An observable containing the user data if authenticated, otherwise null.
+   */
+  checkSessionStatus(): Observable<User | null> {
     return this.http.get<User>(`${environment.apiEndpoint}/api/users/is-authenticated/`, { withCredentials: true }).pipe(
       tap((response: User) => {
         this.currentUserSubject.next(response);
@@ -38,12 +45,12 @@ export class AuthService {
     );
   }
 
+  /**
+   * Logs out the user.
+   */
   async logout() {
     try {
-
-      await this.http.get(`${environment.apiEndpoint}/api/users/logout/`, { 
-        withCredentials: true 
-      }).toPromise();
+      await this.http.get(`${environment.apiEndpoint}/api/users/logout/`, { withCredentials: true }).toPromise();
       
       // Clear local state
       this.currentUserSubject.next(null);
@@ -60,20 +67,39 @@ export class AuthService {
     }
   }
 
+  /**
+   * Checks if the user is authenticated.
+   * 
+   * @returns True if the user is authenticated, otherwise false.
+   */
   isAuthenticated(): boolean {
     return this.currentUserSubject.value !== null;
   }
 
+  /**
+   * Checks if the user is a professor.
+   * 
+   * @returns True if the user is a professor, otherwise false.
+   */
   isProfessor(): boolean {
     return this.currentUserSubject.value?.isProf === true;
   }
 
+  /**
+   * Gets the email of the current user.
+   * 
+   * @returns The email of the current user.
+   */
   getEmail() {
     return this.currentUserSubject.value?.email;
   }
 
+  /**
+   * Gets the ID of the current user.
+   * 
+   * @returns The ID of the current user.
+   */
   getId() {
     return this.currentUserSubject.value?.id;
   }
-
 }

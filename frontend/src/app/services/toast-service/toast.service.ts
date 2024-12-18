@@ -17,7 +17,16 @@ export class ToastService {
   toasts$ = this.toasts.asObservable();
   private counter = 0;
 
-  show(type: ToastType, title: string, message: string, duration: number = 5000) {
+  /**
+   * Shows a toast notification.
+   * 
+   * @param type - The type of the toast (e.g., success, error).
+   * @param title - The title of the toast.
+   * @param message - The message of the toast.
+   * @param duration - The duration the toast should be displayed (default is 5000ms).
+   * @returns The ID of the toast.
+   */
+  show(type: ToastType, title: string, message: string, duration: number = 5000): number {
     const id = this.counter++;
     const toast = { type, title, message, id };
     
@@ -30,6 +39,11 @@ export class ToastService {
     return id;
   }
 
+  /**
+   * Dismisses a toast notification by its ID.
+   * 
+   * @param id - The ID of the toast to dismiss.
+   */
   dismiss(id: number) {
     this.toasts.next(this.toasts.value.filter(t => t.id !== id));
   }

@@ -10,14 +10,26 @@ import { RoleGuard } from './role.guard';
 import { LoadingComponent } from './components/loading/loading.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 
+/**
+ * Application routes configuration.
+ */
 export const routes: Routes = [
-  {path: '', component: LandingPageComponent},
-  {path: 'chat/:semester/:courseAndSection', component: ChatPageComponent},
-  {path: 'instructor-dashboard', component: InstructorPageComponent, canActivate: mapToCanActivate([AuthGuard, RoleGuard]), data: {role: "instructor", isProf: true}},
-  {path: 'classroom/:semester/:courseAndSection', component: ClassroomPageComponent},
-  {path: 'student-dashboard', component: StudentDashboardPageComponent, canActivate: mapToCanActivate([AuthGuard])},
-  {path: 'loading-test', component: LoadingComponent},
-  {path: 'not-found', component: NotFoundComponent},
-  {path: 'access-restricted', component: AccessRestrictedPageComponent},
+  { path: '', component: LandingPageComponent },
+  { path: 'chat/:semester/:courseAndSection', component: ChatPageComponent },
+  {
+    path: 'instructor-dashboard',
+    component: InstructorPageComponent,
+    canActivate: mapToCanActivate([AuthGuard, RoleGuard]),
+    data: { role: 'instructor', isProf: true }
+  },
+  { path: 'classroom/:semester/:courseAndSection', component: ClassroomPageComponent },
+  {
+    path: 'student-dashboard',
+    component: StudentDashboardPageComponent,
+    canActivate: mapToCanActivate([AuthGuard])
+  },
+  { path: 'loading-test', component: LoadingComponent },
+  { path: 'not-found', component: NotFoundComponent },
+  { path: 'access-restricted', component: AccessRestrictedPageComponent },
   { path: '**', component: NotFoundComponent }
 ];

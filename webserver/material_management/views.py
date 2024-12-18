@@ -32,6 +32,15 @@ index_name = "course-embeddings-prod"  # Use a unique index name for each course
 
 # Load PDF file
 def load_pdf(file_path):
+    """
+    Extracts text content from a PDF file.
+
+    Args:
+        file_path (str): Path to the PDF file
+
+    Returns:
+        str: Normalized text content from the PDF
+    """
     with open(file_path, 'rb') as file:
         reader = PdfReader(file)
         text = ''
@@ -43,6 +52,17 @@ def load_pdf(file_path):
 
 # Split text into chunks
 def split_text_into_chunks(text, chunk_size=1000, chunk_overlap=200):
+    """
+    Splits text into overlapping chunks for processing.
+
+    Args:
+        text (str): Input text to split
+        chunk_size (int): Size of each chunk
+        chunk_overlap (int): Number of characters to overlap between chunks
+
+    Returns:
+        list: List of text chunks
+    """
     text_splitter = CharacterTextSplitter(
         separator=" ",
         chunk_size=chunk_size,
@@ -54,6 +74,16 @@ def split_text_into_chunks(text, chunk_size=1000, chunk_overlap=200):
 
 # Embed chunks of text
 def embed_chunks(chunks, model_name='all-MiniLM-L6-v2'):
+    """
+    Generates embeddings for text chunks using a transformer model.
+
+    Args:
+        chunks (list): List of text chunks
+        model_name (str): Name of the transformer model to use
+
+    Returns:
+        tensor: Embedded representations of the chunks
+    """
     model = SentenceTransformer(model_name)
     embeddings = model.encode(chunks, convert_to_tensor=True)
     return embeddings
@@ -61,6 +91,17 @@ def embed_chunks(chunks, model_name='all-MiniLM-L6-v2'):
 
 # Initialize Pinecone index
 def initialize_index(index_name, dimension = INDEX_DIMENSION, metric="cosine"):
+    """
+    Initializes or retrieves a Pinecone index for vector storage.
+
+    Args:
+        index_name (str): Name of the index
+        dimension (int): Dimension of the vectors
+        metric (str): Distance metric for similarity search
+
+    Returns:
+        Index: Pinecone index instance
+    """
     if index_name not in pc.list_indexes().names():
         pc.create_index(name=index_name, dimension=dimension, metric=metric, 
                          spec=ServerlessSpec(cloud='aws', region=PINECONE_ENVIRONMENT))
@@ -68,6 +109,14 @@ def initialize_index(index_name, dimension = INDEX_DIMENSION, metric="cosine"):
     return index
 
 def delete_embeddings(index, class_id, material_name):
+    """
+    Removes embeddings for a specific material from the vector index.
+
+    Args:
+        index: Pinecone index instance
+        class_id (str): Class identifier
+        material_name (str): Name of the material
+    """
     prefix = f"{class_id}#{material_name}#"
     
     # First, list all vectors with this prefix
@@ -91,6 +140,16 @@ def delete_embeddings(index, class_id, material_name):
         index.delete(ids=vector_ids)
 
 def upload_embeddings(index, chunks, embeddings, class_id, material_name):
+    """
+    Uploads chunk embeddings to the vector index.
+
+    Args:
+        index: Pinecone index instance
+        chunks (list): Text chunks
+        embeddings (tensor): Vector embeddings
+        class_id (str): Class identifier
+        material_name (str): Name of the material
+    """
     vectors = [
         {
             "id": f"{class_id}#{material_name}#chunk{i}",
@@ -106,7 +165,15 @@ def upload_embeddings(index, chunks, embeddings, class_id, material_name):
     index.upsert(vectors)
 
 def parse_course_string(course_str):
+    """
+    Parses a course identifier string into components.
 
+    Args:
+        course_str (str): Course identifier (e.g., "CS101-01")
+
+    Returns:
+        tuple: (department, course_number, class_number)
+    """
     pattern = r"([A-Za-z]+)(\d{3})-(\d{2})"
     
     match = re.match(pattern, course_str)
@@ -121,6 +188,15 @@ def parse_course_string(course_str):
 
 @csrf_exempt
 def post_material(request):
+    """
+    Processes and stores uploaded course materials.
+
+    Args:
+        request: HTTP request containing file and metadata
+
+    Returns:
+        JsonResponse: Upload status and material ID
+    """
     if request.method == 'POST' and request.FILES.get('file'):
         try:
             data = request.POST
@@ -159,6 +235,16 @@ def post_material(request):
 
 @csrf_exempt
 def delete_material(request, material_id):
+    """
+    Removes course material and associated embeddings.
+
+    Args:
+        request: HTTP request
+        material_id (int): ID of material to delete
+
+    Returns:
+        JsonResponse: Deletion status
+    """
     if request.method == 'DELETE':
         try:
             material = get_object_or_404(CourseMaterial, id=material_id)
@@ -179,6 +265,16 @@ def delete_material(request, material_id):
     return JsonResponse({'error': 'Invalid HTTP method'}, status=405)
 
 def get_materials(request, course_id):
+    """
+    Retrieves all materials for a specific course.
+
+    Args:
+        request: HTTP request
+        course_id (int): Course identifier
+
+    Returns:
+        JsonResponse: List of course materials
+    """
     try:
         course = Course.objects.get_course(course_id)
         materials = CourseMaterial.objects.filter(course=course)
@@ -189,6 +285,16 @@ def get_materials(request, course_id):
         return JsonResponse({'error': str(e)}, status=400)
     
 def get_material(request, material_id):
+    """
+    Retrieves details for a specific material.
+
+    Args:
+        request: HTTP request
+        material_id (int): Material identifier
+
+    Returns:
+        JsonResponse: Material details
+    """
     try:
         material = CourseMaterial.objects.get_file(material_id)
         material_data = {'id': material.id, 'title': material.title, 'category': material.category, 'uploaded_date': material.uploaded_date}
@@ -198,6 +304,17 @@ def get_material(request, material_id):
 
 @csrf_exempt
 def get_materials_by_class_id(request, semester, classId):
+    """
+    Retrieves all materials for a specific class.
+
+    Args:
+        request: HTTP request
+        semester (str): Course semester
+        classId (str): Class identifier
+
+    Returns:
+        JsonResponse: List of course materials
+    """
     
     if request.method == "GET":
         try:
@@ -217,6 +334,16 @@ def get_materials_by_class_id(request, semester, classId):
 
 @csrf_exempt
 def update_material(request, material_id):
+    """
+    Updates material metadata and optionally replaces the file.
+
+    Args:
+        request: HTTP request
+        material_id (int): Material identifier
+
+    Returns:
+        JsonResponse: Updated material details
+    """
     if request.method == 'PUT' or request.method == 'POST':
         try:
             material = CourseMaterial.objects.get_file(material_id)

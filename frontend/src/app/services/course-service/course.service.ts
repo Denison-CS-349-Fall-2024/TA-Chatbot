@@ -175,21 +175,52 @@ export class CourseService {
     });
   }
 
-  getCourseDetails(semester: string, department: string, courseNumber: number, section: string) {
+  /**
+   * Fetches the details of a specific course.
+   * 
+   * @param semester - The semester of the course.
+   * @param department - The department offering the course.
+   * @param courseNumber - The course number.
+   * @param section - The section of the course.
+   * @returns An observable containing the course details.
+   */
+  getCourseDetails(semester: string, department: string, courseNumber: string, section: string): Observable<{
+    course: {
+      id: string;
+      courseTitle: string;
+      department: string;
+      courseNumber: string;
+      semester: string;
+      credits: string;
+      isActive: boolean;
+      lastUpdated: string;
+      professorFirstName: string;
+      professorLastName: string;
+      section: string;
+      pin: string;
+    },
+    students: {
+      id: string;
+      name: string;
+      email: string;
+      status: string;
+      lastActive: string | null;
+    }[]
+  }> {
     return this.http.get<{
       course: {
         id: string;
         courseTitle: string;
-        pin: string,
-        section: string;
         department: string;
         courseNumber: string;
         semester: string;
         credits: string;
         isActive: boolean;
-        lastUpdated: string;
+        lastUpdated: string;  
         professorFirstName: string;
         professorLastName: string;
+        section: string;
+        pin: string;
       },
       students: {
         id: string;
@@ -201,6 +232,12 @@ export class CourseService {
     }>(`${this.apiUrl}/class-management/courses/${semester}/${department}/${courseNumber}/${section}/`);
   }
 
+  /**
+   * Updates the settings of a course.
+   * 
+   * @param updateData - The data to update the course settings with.
+   * @returns A promise that resolves when the update is complete.
+   */
   async updateCourseSettings(updateData: any): Promise<void> {
     return new Promise((resolve, reject) => {
       this.http.put(`${this.apiUrl}/class-management/courses/update/`, updateData).subscribe({

@@ -2,6 +2,9 @@ import { Component } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
 import { Location } from '@angular/common';
 
+/**
+ * Component representing the "Not Found" page.
+ */
 @Component({
   selector: 'app-not-found',
   standalone: true,
@@ -15,6 +18,9 @@ export class NotFoundComponent {
     private router: Router
   ) {}
 
+  /**
+   * Navigates back in the browser history or redirects to the home page.
+   */
   goBack(): void {
     // Check if there's enough history to go back twice
     if (window.history.length > 2) {

@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { StudentDashboardPageComponent } from './student-dashboard-page.component';
 
 describe('StudentDashboardPageComponent', () => {
@@ -17,6 +16,9 @@ describe('StudentDashboardPageComponent', () => {
     fixture.detectChanges();
   });
 
+  /**
+   * Test to check if the component is created.
+   */
   it('should create', () => {
     expect(component).toBeTruthy();
   });

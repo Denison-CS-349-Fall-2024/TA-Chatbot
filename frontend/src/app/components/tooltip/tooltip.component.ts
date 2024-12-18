@@ -1,6 +1,10 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+
+/**
+ * Component representing a tooltip.
+ */
 @Component({
   selector: 'app-tooltip',
   standalone: true,

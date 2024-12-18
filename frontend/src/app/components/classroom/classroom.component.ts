@@ -15,6 +15,9 @@ import { ConfirmationModalComponent } from '../../components/confirmation-modal/
 import { ToastComponent } from '../../components/toast/toast.component';
 import { formatSemester } from '../../utils/format';
 
+/**
+ * Interface defining the properties of a student in the course.
+ */
 interface Student {
   id: string;
   name: string;
@@ -23,8 +26,14 @@ interface Student {
   lastActive: Date | null;
 }
 
+/**
+ * Type defining the available tabs in the classroom component.
+ */
 type TabType = 'materials' | 'students' | 'settings';
 
+/**
+ * Interface for managing course settings in the classroom component.
+ */
 interface CourseSettings {
   name: string;
   section: string;
@@ -42,69 +51,77 @@ interface CourseSettings {
 }
 
 @Component({
-  selector: 'app-classroom',
-  standalone: true,
-  imports: [CommonModule, TaMaterialsComponent, RouterModule, FormsModule, AddMaterialModalComponent, NgxDocViewerModule, SafePipe, ConfirmationModalComponent, ToastComponent],
-  templateUrl: './classroom.component.html',
-  styleUrl: './classroom.component.css'
+  selector: 'app-classroom', // Selector for the classroom component.
+  standalone: true, // Indicates that this component can be used without being part of a module.
+  imports: [
+    CommonModule,
+    TaMaterialsComponent,
+    RouterModule,
+    FormsModule,
+    AddMaterialModalComponent,
+    NgxDocViewerModule,
+    SafePipe,
+    ConfirmationModalComponent,
+    ToastComponent
+  ], // Modules and components used within the classroom component.
+  templateUrl: './classroom.component.html', // HTML template for the component.
+  styleUrl: './classroom.component.css' // CSS file for the component's styles.
 })
-export class ClassroomComponent  implements OnInit  {
-  protected tabs: TabType[] = [
-    'materials', 
-    'students', 
-    'settings'
-  ];
-  
+export class ClassroomComponent implements OnInit {
+  // Tabs available for navigation in the classroom.
+  protected tabs: TabType[] = ['materials', 'students', 'settings'];
+
+  // List of all students in the classroom.
   protected students: Student[] = [];
+  // List of students after applying filters and sorting.
   protected filteredStudents: Student[] = [];
+  // Search term for filtering students.
   protected studentSearchTerm = '';
+  // Key used for sorting students.
   protected studentSortKey: keyof Student = 'name';
+  // Direction for sorting ('asc' or 'desc').
   protected studentSortDirection: 'asc' | 'desc' = 'asc';
-  
+
+  // Information about the course and semester.
   protected semester!: string;
   protected courseAndSection!: string;
-  protected isStudentView = false;
-  protected isLoading = true;
-  protected selectedTab: TabType = 'materials';
 
+  // Flags for view and loading states.
+  protected isStudentView = false; // Toggles between student and instructor views.
+  protected isLoading = true; // Indicates if data is being loaded.
+  protected selectedTab: TabType = 'materials'; // Currently selected tab.
+
+  // State for showing or hiding the settings menu.
   protected showSettingsMenu = false;
-  protected courseMaterials: Material[] = [];
-  protected courseSettings!: Course;
-  // protected courseSettings: CourseSettings = {
-  //   name: '',
-  //   section: '',
-  //   department: '',
-  //   courseNumber: '',
-  //   credits: '',
-  //   isVisible: true,
-  //   allowStudentDiscussions: true,
-  //   aiResponseTime: 30,
-  //   maxQuestionsPerStudent: 50,
-  //   requireApproval: false,
-  //   notifyTAOnQuestions: true,
-  //   aiPersonality: 'professional',
-  //   defaultLanguage: 'en'
-  // };
 
-  protected isAddMaterialModalOpen = false;
-  protected selectedMaterial: Material | null = null;
+  // Course materials and settings.
+  protected courseMaterials: Material[] = []; // List of course materials.
+  protected courseSettings!: Course; // Current course settings.
 
+  // Modal-related states.
+  protected isAddMaterialModalOpen = false; // State of the add-material modal.
+  protected selectedMaterial: Material | null = null; // Currently selected material.
+
+  // Subscription for tracking changes in course materials.
   protected materialSubscription!: Subscription;
 
+  // Material selected for deletion.
   protected materialToDelete: Material | null = null;
 
+  // Course details and metadata.
   protected courseDetails: Course | null = null;
   protected lastUpdated: string | null = null;
 
+  // Original course settings for change detection.
   protected originalSettings: Course | null = null;
-  protected hasUnsavedChanges = false;
+  protected hasUnsavedChanges = false; // Indicates if there are unsaved changes.
 
+  // AI personality and language options for course settings.
   protected aiPersonalityOptions = [
     { value: 'professional', label: 'Professional' },
     { value: 'friendly', label: 'Friendly' },
     { value: 'socratic', label: 'Socratic Method' }
   ];
-
   protected languageOptions = [
     { value: 'en', label: 'English' },
     { value: 'es', label: 'Spanish' },
@@ -112,29 +129,40 @@ export class ClassroomComponent  implements OnInit  {
   ];
 
   constructor(
-    private route: ActivatedRoute,
-    private courseService: CourseService,
-    protected toastService: ToastService,
+    private route: ActivatedRoute, // ActivatedRoute to access route parameters.
+    private courseService: CourseService, // Service to manage course-related operations.
+    protected toastService: ToastService // Service to display toast notifications.
   ) {}
 
+  /**
+   * Lifecycle hook that initializes the component.
+   * Fetches course details, students, and materials.
+   */
   async ngOnInit() {
-    this.semester = this.route.snapshot.paramMap.get("semester")!;
-    this.courseAndSection = this.route.snapshot.paramMap.get("courseAndSection")!;
-    
+    this.semester = this.route.snapshot.paramMap.get('semester')!; // Retrieve semester from route.
+    this.courseAndSection = this.route.snapshot.paramMap.get('courseAndSection')!; // Retrieve course and section from route.
+
+    // Parse course and section details from route parameters.
     const matches = this.courseAndSection.match(/([a-z]+)(\d+)-(\d+)/i);
     if (matches) {
       const [_, department, courseNumber, section] = matches;
-      
+
+      // Fetch course details from the course service.
       this.courseService.getCourseDetails(
         this.semester,
         department,
-        parseInt(courseNumber),
+        courseNumber,
         section
       ).subscribe({
         next: (response) => {
-          this.courseDetails = response.course;
-          this.lastUpdated = response.course.lastUpdated;
-          
+          this.courseDetails = {
+            ...response.course,
+            section: response.course.section || '',
+            pin: response.course.pin || ''
+          };
+          this.lastUpdated = response.course.lastUpdated; // Update last updated timestamp.
+
+          // Initialize course settings with fetched data.
           this.courseSettings = {
             id: response.course.id,
             semester: response.course.semester,
@@ -148,164 +176,155 @@ export class ClassroomComponent  implements OnInit  {
             courseNumber: response.course.courseNumber,
             credits: response.course.credits
           };
-          
+
+          // Save original settings for comparison.
           this.originalSettings = { ...this.courseSettings };
-          
-          this.students = response.students.map(student => ({
+
+          // Map and update student data with last active timestamp.
+          this.students = response.students.map((student) => ({
             ...student,
             lastActive: student.lastActive ? new Date(student.lastActive) : null
           }));
-          this.filterStudents();
+          this.filterStudents(); // Apply filters to student list.
         },
-        error: (error) => {
-          this.toastService.show('error', 'Error', 'Failed to load course details');
+        error: () => {
+          this.toastService.show('error', 'Error', 'Failed to load course details'); // Show error toast.
         }
       });
     }
 
+    // Subscribe to materials observable for updates.
     this.materialSubscription = this.courseService.materials$.subscribe((materials) => {
-      this.courseMaterials = materials;
-      this.isLoading = false;
+      this.courseMaterials = materials; // Update course materials.
+      this.isLoading = false; // Set loading to false.
     });
 
+    // Fetch initial materials for the course.
     await this.courseService.fetchMaterials(this.semester, this.courseAndSection);
   }
 
+  /**
+   * Sets the currently selected tab.
+   * @param tab - The tab to be selected.
+   */
   setSelectedTab(tab: TabType) {
-    this.selectedTab = tab;
+    this.selectedTab = tab; // Update selected tab.
   }
 
-  async loadCourseData() {
-    try {
-      this.isLoading = true;
-      await Promise.all([
-        this.loadStudents(),
-        this.loadDummyMaterials(),
-        this.courseService.fetchMaterials(this.semester, this.courseAndSection)
-      ]);
-      
-      this.toastService.show('success', 'Success', 'Course data loaded successfully');
-    } catch (error) {
-      this.toastService.show('error', 'Error', 'Failed to load course data');
-    } finally {
-      this.isLoading = false;
-    }
-  }
-
-  async loadStudents() {
-    // Simulated student data
-    this.students = Array(45).fill(null).map((_, i) => ({
-      id: `STU${i + 1}`,
-      name: `Student ${i + 1}`,
-      email: `student${i + 1}@university.edu`,
-      status: Math.random() > 0.6 ? 'Enrolled' : (Math.random() > 0.3 ? 'Waitlisted' : 'Not Enrolled'),
-      lastActive: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000),
-    }));
-    this.filterStudents();
-  }
-
+  /**
+   * Filters the student list based on the search term and applies sorting.
+   */
   filterStudents() {
     this.filteredStudents = this.students
-      .filter(student => 
-        student.name.toLowerCase().includes(this.studentSearchTerm.toLowerCase()) ||
+      .filter((student) => 
+        student.name.toLowerCase().includes(this.studentSearchTerm.toLowerCase()) || 
         student.email.toLowerCase().includes(this.studentSearchTerm.toLowerCase())
       )
       .sort((a, b) => {
         const aValue = a[this.studentSortKey];
         const bValue = b[this.studentSortKey];
 
-        // Handle null values in sorting
+        // Handle null values in sorting.
         if (aValue === null && bValue === null) return 0;
-        if (aValue === null) return 1;  // null values go to the end
+        if (aValue === null) return 1;
         if (bValue === null) return -1;
 
-        // Special handling for dates
+        // Special handling for dates.
         if (this.studentSortKey === 'lastActive') {
           const aDate = aValue as Date;
           const bDate = bValue as Date;
-          return this.studentSortDirection === 'asc' 
+          return this.studentSortDirection === 'asc'
             ? aDate.getTime() - bDate.getTime()
             : bDate.getTime() - aDate.getTime();
         }
 
-        // Regular string/number comparison
-        return this.studentSortDirection === 'asc' 
+        // Regular string/number comparison.
+        return this.studentSortDirection === 'asc'
           ? aValue > bValue ? 1 : -1
           : aValue < bValue ? 1 : -1;
       });
   }
 
+  /**
+   * Toggles the view mode between instructor and student views.
+   */
   toggleView() {
-    this.isStudentView = !this.isStudentView;
+    this.isStudentView = !this.isStudentView; // Switch view mode.
     this.toastService.show(
       'info',
       'View Changed',
       `Switched to ${this.isStudentView ? 'student' : 'instructor'} view`
-    );
+    ); // Show toast notification.
   }
+
 
 
   exportCourseData() {
     try {
-      // Implementation would go here
-      this.toastService.show('success', 'Success', 'Course data exported successfully');
+      // Placeholder for course data export implementation.
+      this.toastService.show('success', 'Success', 'Course data exported successfully'); // Display success notification.
     } catch (error) {
-      this.toastService.show('error', 'Error', 'Failed to export course data');
+      this.toastService.show('error', 'Error', 'Failed to export course data'); // Display error notification if export fails.
     }
   }
-
+  
   generateReport() {
     try {
-      // Implementation would go here
-      this.toastService.show('success', 'Processing', 'Generating course report...');
+      // Placeholder for report generation logic.
+      this.toastService.show('success', 'Processing', 'Generating course report...'); // Notify the user that report generation has started.
     } catch (error) {
-      this.toastService.show('error', 'Error', 'Failed to generate report');
+      this.toastService.show('error', 'Error', 'Failed to generate report'); // Display error notification if report generation fails.
     }
   }
-
+  
   sendBulkMessage() {
     try {
-      // Implementation would go here
-      this.toastService.show('success', 'Success', 'Messages sent successfully');
+      // Placeholder for bulk messaging implementation.
+      this.toastService.show('success', 'Success', 'Messages sent successfully'); // Notify the user of successful message sending.
     } catch (error) {
-      this.toastService.show('error', 'Error', 'Failed to send messages');
+      this.toastService.show('error', 'Error', 'Failed to send messages'); // Display error notification if messaging fails.
     }
   }
-
+  
   sortStudents(key: string) {
     const sortKey = key as keyof Student;
-    
+  
+    // Toggle sorting direction if the same key is selected, otherwise set to ascending.
     if (this.studentSortKey === sortKey) {
       this.studentSortDirection = this.studentSortDirection === 'asc' ? 'desc' : 'asc';
     } else {
       this.studentSortKey = sortKey;
       this.studentSortDirection = 'asc';
     }
-
-    this.filterStudents();
+  
+    this.filterStudents(); // Apply sorting after updating the direction or key.
   }
-
+  
   toggleSettingsMenu() {
-    this.showSettingsMenu = !this.showSettingsMenu;
+    this.showSettingsMenu = !this.showSettingsMenu; // Toggle visibility of the settings menu.
   }
-
+  
   closeSettingsMenu() {
-    this.showSettingsMenu = false;
+    this.showSettingsMenu = false; // Hide the settings menu.
   }
-
+  
   checkForChanges() {
-    this.hasUnsavedChanges = this.originalSettings ? Object.keys(this.courseSettings).some(
-      key => this.courseSettings[key as keyof Course] !== this.originalSettings?.[key as keyof Course]
-    ) : false;
+    // Compare current course settings with original settings to detect changes.
+    this.hasUnsavedChanges = this.originalSettings
+      ? Object.keys(this.courseSettings).some(
+          (key) => this.courseSettings[key as keyof Course] !== this.originalSettings?.[key as keyof Course]
+        )
+      : false;
   }
-
+  
   async saveSettings() {
     try {
       const courseId = this.courseDetails?.id;
       if (!courseId) {
-        throw new Error('Course ID not found');
+        throw new Error('Course ID not found'); // Throw error if course ID is missing.
       }
-
+  
+      // Prepare update data with the relevant fields for saving.
       const updateData = {
         id: courseId,
         courseTitle: this.courseSettings.courseTitle,
@@ -314,102 +333,103 @@ export class ClassroomComponent  implements OnInit  {
         courseNumber: this.courseSettings.courseNumber,
         credits: this.courseSettings.credits,
         isActive: true,
-        // Add any other fields you want to update
       };
-
-      await this.courseService.updateCourseSettings(updateData);
-      this.originalSettings = { ...this.courseSettings };
-      this.hasUnsavedChanges = false;
-      this.toastService.show('success', 'Success', 'Course settings saved successfully');
+  
+      await this.courseService.updateCourseSettings(updateData); // Update course settings via the service.
+      this.originalSettings = { ...this.courseSettings }; // Sync original settings with saved settings.
+      this.hasUnsavedChanges = false; // Reset unsaved changes flag.
+      this.toastService.show('success', 'Success', 'Course settings saved successfully'); // Notify the user of successful save.
     } catch (error) {
-      this.toastService.show('error', 'Error', 'Failed to save settings');
+      this.toastService.show('error', 'Error', 'Failed to save settings'); // Display error notification if save fails.
     }
   }
-
+  
   resetSettings() {
     if (this.originalSettings) {
-      this.courseSettings = { ...this.originalSettings };
-      this.hasUnsavedChanges = false;
+      this.courseSettings = { ...this.originalSettings }; // Revert to original settings.
+      this.hasUnsavedChanges = false; // Reset unsaved changes flag.
     }
   }
-
+  
   getMaterialTypeClass(type: Material['type']): string {
+    // Map material types to their respective classes for styling.
     const classes = {
       pdf: 'bg-red-100 text-red-600',
-      docx: 'bg-yellow-100 text-yellow-600'
+      docx: 'bg-yellow-100 text-yellow-600',
     };
-    return classes[type];
+    return classes[type]; // Return the class corresponding to the material type.
   }
-
+  
   getMaterialIcon(type: Material['type']): string {
-    // Return SVG markup based on type
+    // Return the appropriate SVG path markup for the given material type.
     const icons = {
       pdf: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>`,
-      docx: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>`
+      docx: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>`,
     };
-    return icons[type];
+    return icons[type]; // Return the SVG markup based on type.
   }
-
+  
   openAddMaterialModal() {
-    this.isAddMaterialModalOpen = true;
+    this.isAddMaterialModalOpen = true; // Open the add material modal.
   }
-
+  
   handleModalClosed() {
-    this.isAddMaterialModalOpen = false;
+    this.isAddMaterialModalOpen = false; // Close the add material modal.
   }
-
+  
   bulkUpload() {
-    // Implementation for bulk upload
-    this.toastService.show('info', 'Coming Soon', 'Bulk upload feature coming soon');
+    // Placeholder for bulk upload implementation.
+    this.toastService.show('info', 'Coming Soon', 'Bulk upload feature coming soon'); // Notify the user that the feature is not yet available.
   }
-
+  
   async deleteMaterial(material: Material) {
-    this.materialToDelete = material;
+    this.materialToDelete = material; // Store the material to be deleted.
   }
-
+  
   protected async handleDeleteConfirm() {
     if (this.materialToDelete) {
       try {
+        // Delete the selected material using the course service.
         await this.courseService.deleteMaterial(this.materialToDelete.id);
-        this.toastService.show('success', 'Success', `${this.materialToDelete.title} deleted successfully`);
+        this.toastService.show('success', 'Success', `${this.materialToDelete.title} deleted successfully`); // Notify of successful deletion.
       } catch (error) {
-        this.toastService.show('error', 'Error', `Failed to delete ${this.materialToDelete.title}`);
+        this.toastService.show('error', 'Error', `Failed to delete ${this.materialToDelete.title}`); // Notify if deletion fails.
       } finally {
-        this.materialToDelete = null;
+        this.materialToDelete = null; // Reset the material to delete.
       }
     }
   }
-
+  
   protected handleDeleteCancel() {
-    this.materialToDelete = null;
+    this.materialToDelete = null; // Cancel the delete operation.
   }
-
+  
   protected viewMaterial(material: Material) {
-    this.selectedMaterial = material;
+    this.selectedMaterial = material; // Set the material to be viewed.
   }
-
+  
   closeViewer() {
-    this.selectedMaterial = null;
+    this.selectedMaterial = null; // Close the material viewer.
   }
-
+  
   protected downloadMaterial(material: Material) {
     try {
-      // Implement download logic
-      this.toastService.show('success', 'Success', `${material.title} download started`);
+      // Placeholder for download logic.
+      this.toastService.show('success', 'Success', `${material.title} download started`); // Notify of successful download initiation.
     } catch (error) {
-      this.toastService.show('error', 'Error', `Failed to download ${material.title}`);
+      this.toastService.show('error', 'Error', `Failed to download ${material.title}`); // Notify if download fails.
     }
   }
-
+  
   protected editMaterial(material: Material) {
     try {
-      // Implement edit logic
-      this.toastService.show('info', 'Coming Soon', 'Edit feature coming soon');
+      // Placeholder for edit material logic.
+      this.toastService.show('info', 'Coming Soon', 'Edit feature coming soon'); // Notify the user of upcoming edit functionality.
     } catch (error) {
-      this.toastService.show('error', 'Error', 'Failed to edit material');
+      this.toastService.show('error', 'Error', 'Failed to edit material'); // Notify if edit fails.
     }
   }
-
+  
   private loadDummyMaterials() {
     const dummyMaterials: Material[] = [
       {
@@ -425,19 +445,19 @@ export class ClassroomComponent  implements OnInit  {
         type: 'docx',
         size: 1800000,
         uploadDate: new Date('2024-01-28'),
-      }
+      },
     ];
   
-
-    return new Promise<void>(resolve => {
+    // Simulate data loading with a delay.
+    return new Promise<void>((resolve) => {
       setTimeout(() => {
-        this.courseMaterials = dummyMaterials;
+        this.courseMaterials = dummyMaterials; // Load dummy materials.
         resolve();
       }, 800);
     });
   }
   
-  // Add this pipe method for file size formatting
+  // Formats file size into a readable string (e.g., KB, MB).
   protected formatFileSize(bytes: number): string {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
@@ -445,52 +465,54 @@ export class ClassroomComponent  implements OnInit  {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   }
-
+  
   formatSemester(semester: string): string {
-    return formatSemester(semester);
+    return formatSemester(semester); // Format the semester string.
   }
-
+  
   protected downloadStudentList() {
-    // Only include filtered students in the CSV
-    const csvData = this.filteredStudents.map(student => ({
+    // Prepare data for CSV export.
+    const csvData = this.filteredStudents.map((student) => ({
       Name: student.name,
       Email: student.email,
       Status: student.status,
-      'Last Active': student.lastActive ? new Date(student.lastActive).toLocaleString() : 'Never'
+      'Last Active': student.lastActive
+        ? new Date(student.lastActive).toLocaleString()
+        : 'Never',
     }));
-
-    // Convert to CSV
+  
+    // Convert data to CSV format.
     const headers = Object.keys(csvData[0]);
     const csv = [
-      headers.join(','), // Header row
-      ...csvData.map(row => headers.map(header => 
-        // Wrap values in quotes and escape existing quotes
-        `"${String(row[header as keyof typeof row]).replace(/"/g, '""')}"`
-      ).join(','))
+      headers.join(','), // Add header row.
+      ...csvData.map((row) =>
+        headers
+          .map((header) =>
+            `"${String(row[header as keyof typeof row]).replace(/"/g, '""')}"`
+          )
+          .join(',')
+      ),
     ].join('\n');
-
-    // Create and download blob
+  
+    // Create a downloadable blob and trigger download.
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
     link.download = `${this.courseAndSection}_students_${this.semester}.csv`;
-    
-    // Trigger download
-    document.body.appendChild(link);
-    link.click();
-    
-    // Cleanup
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(url);
-    
-    this.toastService.show('success', 'Success', 'Student list downloaded successfully');
+  
+    document.body.appendChild(link); // Append link to body.
+    link.click(); // Trigger click for download.
+    document.body.removeChild(link); // Clean up link element.
+    window.URL.revokeObjectURL(url); // Revoke the object URL.
+  
+    this.toastService.show('success', 'Success', 'Student list downloaded successfully'); // Notify of successful download.
   }
-
+  
   copyPin() {
     if (this.courseDetails?.pin) {
-      navigator.clipboard.writeText(this.courseDetails.pin);
-      this.toastService.show('success', 'Copied!','Course PIN copied to clipboard');
+      navigator.clipboard.writeText(this.courseDetails.pin); // Copy course PIN to clipboard.
+      this.toastService.show('success', 'Copied!', 'Course PIN copied to clipboard'); // Notify of successful copy.
     }
   }
-}
+}  
