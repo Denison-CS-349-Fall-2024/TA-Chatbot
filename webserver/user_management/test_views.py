@@ -1,17 +1,11 @@
+# user_management/test_views.py
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 from .models import User
 
 class UserTests(APITestCase):
-    """
-    Test case for user registration and login views.
-    """
-
     def setUp(self):
-        """
-        Set up the test client and initial data.
-        """
         self.register_url = reverse('register')
         self.login_url = reverse('login')
         self.user_data = {
@@ -22,18 +16,12 @@ class UserTests(APITestCase):
         }
 
     def test_register_user(self):
-        """
-        Test registering a new user.
-        """
         response = self.client.post(self.register_url, self.user_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(User.objects.count(), 1)
         self.assertEqual(User.objects.get().email, 'test@example.com')
 
     def test_login_user(self):
-        """
-        Test logging in a registered user.
-        """
         # First register the user
         response = self.client.post(self.register_url, self.user_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -48,4 +36,16 @@ class UserTests(APITestCase):
             'password': 'password123'
         }
         response = self.client.post(self.login_url, login_data, format='json')
+        print("Login response:", response.data)  # Debugging output
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("message", response.data)
+        self.assertEqual(response.data["message"], "Login successful!")
+    def test_login_invalid_user(self):
+        login_data = {
+            'email': 'wrong@example.com',
+            'password': 'wrongpassword'
+        }
+        response = self.client.post(self.login_url, login_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertIn("error", response.data)

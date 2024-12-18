@@ -1,11 +1,9 @@
 from django.db import models
 
-# This file defines our model, ChatSession
+#this file define our model, ChatSession
+
 
 class ChatSession(models.Model):
-    """
-    Model representing a chat session.
-    """
     course_name = models.CharField(max_length=255)
     user_query = models.TextField()
     gpt_response = models.TextField()  # Storing GPT-4's response

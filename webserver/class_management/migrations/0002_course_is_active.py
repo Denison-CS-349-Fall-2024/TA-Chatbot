@@ -2,10 +2,8 @@
 
 from django.db import migrations, models
 
+
 class Migration(migrations.Migration):
-    """
-    Migration to add the 'is_active' field to the Course model.
-    """
 
     dependencies = [
         ('class_management', '0001_initial'),

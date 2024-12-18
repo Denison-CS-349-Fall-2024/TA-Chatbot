@@ -5,22 +5,8 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
-    """
-    Custom adapter for handling social account logins.
-    """
     
     def populate_user(self, request, sociallogin, data):
-        """
-        Populate the user instance with data from the social login.
-        
-        Args:
-            request (HttpRequest): The HTTP request object.
-            sociallogin (SocialLogin): The social login instance.
-            data (dict): The data from the social login.
-        
-        Returns:
-            User: The populated user instance.
-        """
         userType = request.COOKIES.get('userType')
 
         # Call the original populate_user to maintain normal behavior
@@ -42,10 +28,6 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         """
         This method is called after a successful social login but before the user is signed in.
         If an existing user with the same email exists, link the social account to that user.
-        
-        Args:
-            request (HttpRequest): The HTTP request object.
-            sociallogin (SocialLogin): The social login instance.
         """
         # Ensure the user is not already authenticated
         if request.user.is_authenticated:
@@ -54,11 +36,13 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         # Get the email from the social login's extra data
         email = sociallogin.account.extra_data.get('email')
         if not email:
-            return
+            return  # If email is missing, we can't proceed
 
+        # Try to find an existing user with the same email
         try:
-            # Try to find an existing user with the same email
-            user = User.objects.get(email=email)
-            sociallogin.connect(request, user)
+            existing_user = User.objects.get(email=email)
+            # Link the social account to the existing user
+            sociallogin.connect(request, existing_user)
         except User.DoesNotExist:
+            # No user found; allow Allauth to handle signup
             pass

@@ -1,7 +1,6 @@
 from django.urls import path
 from . import views
 
-# URL patterns for the class management app
 urlpatterns = [
     path('courses/create/', views.create_course, name='create_course'),
     path('courses/delete/<int:course_id>/', views.delete_course, name='delete_course'),
