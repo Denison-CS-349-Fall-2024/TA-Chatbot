@@ -37,14 +37,14 @@ Students can access their course chatbots using unique PINs provided by their pr
 TA-Chatbot/
 ├── frontend/                 # Angular frontend application
 │   └── src/                  # Source files for the frontend
-├── webserver/               # Django backend application
-│   ├── chatbot_management/  # application for chatbot logic
-│   ├── class_management/  # application for class logic
+├── webserver/                # Django backend application
+│   ├── chatbot_management/   # application for chatbot logic
+│   ├── class_management/     # application for class logic
 │   ├── material_management/  # application for materials logic
-│   ├── student_management/  # application for student enrollment logic
-│   ├── user_management/  # application for user management logic
-│   ├── requirements.txt  # dependencies
-│   ├── webserver/  # application for webserver logic
+│   ├── student_management/   # application for student enrollment logic
+│   ├── user_management/      # application for user management logic
+│   ├── requirements.txt      # dependencies
+│   ├── webserver/            # application for webserver logic
 │   └── ..
 ├── .env  # environment variables
 ├── docker-compose.yml  # Docker compose configuration
