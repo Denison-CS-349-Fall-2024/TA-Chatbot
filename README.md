@@ -46,8 +46,8 @@ TA-Chatbot/
 │   ├── requirements.txt      # dependencies
 │   ├── webserver/            # application for webserver logic
 │   └── ..
-├── .env  # environment variables
-├── docker-compose.yml  # Docker compose configuration
+├── .env                      # environment variables
+├── docker-compose.yml        # Docker compose configuration
 └── README.md 
 ```
 
