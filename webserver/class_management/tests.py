@@ -1,60 +1,105 @@
+"""
+Class Management Tests
+Tests course-related operations and views.
+
+This module tests:
+- Course creation and deletion
+- Course updates
+- Course queries and filters
+- Error handling
+"""
+
 from django.test import TestCase, Client
 from django.urls import reverse
 from .models import Course
+from user_management.models import User
+import json
 
 class CourseViewsTestCase(TestCase):
     
     def setUp(self):
+        """Initialize test environment before each test."""
         self.client = Client()
+        
+        # Create a test professor
+        self.professor = User.objects.create_user(
+            email="professor@test.com",
+            password="testpass123",
+            first_name="Alan",
+            last_name="Turing",
+            is_prof=True
+        )
 
         # Test data for creating a course
         self.test_course_data = {
             'name': 'Data Science Basics',
-            'pin': 'AB1234',
-            'section': 'A',
-            'professor_id': 'Prof. Alan Turing'  # This can be an ID of a user if connected to actual User model
+            'section': '01',
+            'department': 'CS',
+            'course_number': 101,
+            'semester': 'fall2024',
+            'credits': 4,
+            'professor_id': str(self.professor.id)
         }
 
-        # Create an initial course to test deletion
+        # Create an initial course for testing
         self.existing_course = Course.objects.create(
-            name="Python for Beginners",
-            pin="XYZ5678",
-            section= 'A',
-            professor="Prof. John Doe"
+            name="Python Programming",
+            section='01',
+            department='CS',
+            course_number=201,
+            semester='fall2024',
+            pin="XYZ789",
+            professor=str(self.professor.id),
+            credits=4
         )
 
     def test_create_course(self):
-        """Test creating a course through the create_course view."""
+        """Test course creation functionality."""
         response = self.client.post(
-            reverse('create_course'),  # Ensure this URL name matches your URL configuration
-            data=self.test_course_data,
+            reverse('create_course'),
+            data=json.dumps(self.test_course_data),
             content_type='application/json'
         )
         
-        # Check if the response status code is 201 (Created)
         self.assertEqual(response.status_code, 201)
-
-        # Check if the course was created in the database
-        created_course = Course.objects.get(name='Data Science Basics')
-        self.assertIsNotNone(created_course)
-        self.assertEqual(created_course.name, 'Data Science Basics')
-        self.assertEqual(created_course.professor, 'Prof. Alan Turing')
+        data = json.loads(response.content)
+        self.assertEqual(data['course']['courseTitle'], 'Data Science Basics')
+        self.assertTrue('pin' in data['course'])
 
     def test_delete_course(self):
-        """Test deleting a course through the delete_course view."""
-        course_id = self.existing_course.id
-
-        # Delete the existing course
+        """Test course deletion functionality."""
         response = self.client.delete(
-            reverse('delete_course', args=[course_id])
+            reverse('delete_course', args=[self.existing_course.id])
         )
-
-        # Check if the response status code is 200 (OK)
+        
         self.assertEqual(response.status_code, 200)
+        self.assertFalse(Course.objects.filter(id=self.existing_course.id).exists())
 
-        # Check if the course is deleted from the database
-        with self.assertRaises(Course.DoesNotExist):
-            Course.objects.get(id=course_id)
+    def test_get_course_details(self):
+        """Test retrieving course details."""
+        response = self.client.get(
+            reverse('get_course_details', kwargs={
+                'semester': self.existing_course.semester,
+                'department': self.existing_course.department,
+                'course_number': self.existing_course.course_number,
+                'section': self.existing_course.section
+            })
+        )
+        
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEqual(data['course']['courseTitle'], 'Python Programming')
+
+
+    def test_courses_by_professor(self):
+        """Test retrieving courses by professor."""
+        response = self.client.get(
+            reverse('courses_by_professor', args=[self.professor.id])
+        )
+        
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEqual(len(data['courses']), 1)
 
 
 
